@@ -5,6 +5,7 @@ import std.file;
 import std.stdio;
 import std.string;
 import token;
+import error;
 
 class Lexer {
 
@@ -150,6 +151,7 @@ class Lexer {
                     default:
                         literal ~= currentChar;
                         tokType = TokenType.INVALID;
+                        ErrorManager.addLexerError(ErrorLevel.ERROR, "Unexpected symbol: " ~ literal, line + 1, column);
                         break;
                 }
             }

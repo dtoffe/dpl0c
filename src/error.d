@@ -65,8 +65,9 @@ static class ErrorManager {
         addError(ErrorType.COMPILER, level, message);
     }
 
-    static void addLexerError(ErrorLevel level, string message, Token token) {
-        addError(ErrorType.LEXER, level, message ~ " token: " ~ token.toString() ~ ".\n");
+    static void addLexerError(ErrorLevel level, string message, int line, int column) {
+        addError(ErrorType.LEXER, level, message ~ " TokenType: " ~ to!string(TokenType.INVALID) ~
+                " at line: " ~ to!string(line) ~ " column: " ~ to!string(column) ~".\n");
     }
 
     static void addParserError(ErrorLevel level, string message) {

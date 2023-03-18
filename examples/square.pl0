@@ -4,7 +4,8 @@ var x, squ;
 
 procedure square;
 begin
-   squ:= x * x
+// squ:= x * x
+   squ:= x & x
 end;
 
 begin

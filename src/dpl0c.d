@@ -1,6 +1,7 @@
 module dpl0c;
 
 import std.stdio;
+import error;
 import lexer;
 import token;
 
@@ -17,4 +18,5 @@ void main(string[] args) {
             " Line: ", tok.getLine(), " Column: ", tok.getColumn());
         tok = lex.nextToken();
     }
+    ErrorManager.printErrors();
 }
