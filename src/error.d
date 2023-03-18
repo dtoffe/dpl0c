@@ -1,6 +1,8 @@
 module error;
 
+import std.conv;
 import std.stdio;
+import token;
 
 /** 
  * This ErrorHandler class is very loosely inspired in another one found in the source code from the book
@@ -31,19 +33,20 @@ static class ErrorManager {
 
     static uint MAX_ERRORS = 20;
     static uint errorCount = 0;
-    static ErrorMessage[] errors = new ErrorMessage[MAX_ERRORS];
+    static ErrorMessage[] errors;
 
     static this() {
+        errors = new ErrorMessage[MAX_ERRORS];
     }
 
     static void addError(ErrorType type, ErrorLevel level, string message) {
-        if (errorCount < maxErrors - 1) {
-            errors[errorCount++] = new ErrorMessage(type, level, message);
+        if (errorCount < MAX_ERRORS - 1) {
+            errors[errorCount++] = ErrorMessage(type, level, message);
         } else {
-            errors[errorCount++] = new ErrorMessage(ErrorType.COMPILER, ErrorLevel.ERROR,
+            errors[errorCount++] = ErrorMessage(ErrorType.COMPILER, ErrorLevel.ERROR,
                                                     "Too many errors, compilation stopped.");
             printErrors();
-            exit(1);
+            //exit(1);
         }
     }
 
@@ -63,19 +66,18 @@ static class ErrorManager {
     }
 
     static void addLexerError(ErrorLevel level, string message, Token token) {
-        addError(ErrorType.LEXER, level, message + " at line: " + token.line + 
-                " column: " + token.column + " found lexeme: " + token.lexeme + ".\n");
+        addError(ErrorType.LEXER, level, message ~ " token: " ~ token.toString() ~ ".\n");
     }
 
     static void addParserError(ErrorLevel level, string message) {
         addError(ErrorType.PARSER, level, message);
     }
 
-    static void addSemanticError() {
+    static void addSemanticError(ErrorLevel level, string message) {
         addError(ErrorType.SEMCHECKER, level, message);
     }
 
-    static void addCodeGenError() {
+    static void addCodeGenError(ErrorLevel level, string message) {
         addError(ErrorType.CODEGEN, level, message);
     }
 

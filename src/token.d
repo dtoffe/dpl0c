@@ -1,5 +1,6 @@
 module token;
 
+import std.conv;
 import std.stdio;
 
 enum TokenType {
@@ -111,6 +112,7 @@ TokenType lookUpIdent(string ident) {
     return TokenType.IDENT;
 }
 
-string toString() {
-    return tokenType.toString() + " " + literal;
+string toString(Token token) {
+    return "TokenType: " ~ to!string(token.tokenType) ~ " at line: " ~ to!string(token.getLine()) ~
+                " column: " ~ to!string(token.getColumn()) ~ " lexeme: " ~ token.getLiteral();
 }
