@@ -106,7 +106,119 @@ class ProcDeclNode : AstNode {
 
 }
 
-class StatementNode : AstNode {
+abstract class StatementNode : AstNode {
+
+}
+
+class AssignNode : StatementNode {
+
+    string name;
+    ExpressionNode expression;
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
+    }
+
+}
+
+class CallNode : StatementNode {
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
+    }
+
+}
+
+class ReadNode : StatementNode {
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
+    }
+
+}
+
+class WriteNode : StatementNode {
+
+    ExpressionNode expression;
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
+    }
+
+}
+
+class BeginEndNode : StatementNode {
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
+    }
+
+}
+
+class IfThenNode : StatementNode {
+
+    ConditionNode condition;
+    StatementNode ifStatement;
+    StatementNode elseStatement;
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
+    }
+
+}
+
+class WhileDoNode : StatementNode {
+
+    ConditionNode condition;
+    StatementNode statement;
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
+    }
+
+}
+
+abstract class ExpressionNode : AstNode {
+
+}
+
+class NumberNode : ExpressionNode {
+
+    int value;
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
+    }
+
+}
+
+class VariableNode : ExpressionNode {
+    
+    string name;
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
+    }
+
+}
+
+class BinaryOpNode : ExpressionNode {
+
+    ExpressionNode left;
+    ExpressionNode right;
+    string operation;
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
+    }
+
+}
+
+class ConditionNode : ExpressionNode {
+
+    ExpressionNode left;
+    ExpressionNode right;
+    string operation;
 
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
@@ -115,10 +227,24 @@ class StatementNode : AstNode {
 }
 
 interface AstVisitor {
+
     void visit(ProgramNode node);
     void visit(BlockNode node);
     void visit(ConstDeclNode node);
     void visit(VarDeclNode node);
     void visit(ProcDeclNode node);
     void visit(StatementNode node);
+    void visit(AssignNode node);
+    void visit(CallNode node);
+    void visit(ReadNode node);
+    void visit(WriteNode node);
+    void visit(BeginEndNode node);
+    void visit(IfThenNode node);
+    void visit(WhileDoNode node);
+    void visit(ExpressionNode node);
+    void visit(NumberNode node);
+    void visit(VariableNode node);
+    void visit(BinaryOpNode node);
+    void visit(ConditionNode node);
+
 }

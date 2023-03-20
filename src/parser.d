@@ -79,7 +79,7 @@ class Parser {
     }
 
     StatementNode parseStatement() {
-        StatementNode statNode = new StatementNode();
+        StatementNode statNode = null; //new StatementNode();
         return statNode;
     }
 
