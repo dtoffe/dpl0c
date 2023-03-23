@@ -10,6 +10,14 @@ class ProgramNode : AstNode {
 
     BlockNode block;
 
+    this() {
+        
+    }
+
+    BlockNode getBlock() {
+        return block;
+    }
+    
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
     }
@@ -92,6 +100,14 @@ class VarDeclNode : AstNode {
 
     string varName;
 
+    this(string varName) {
+        this.varName = varName;
+    }
+    
+    string getVarName() {
+        return varName;
+    }
+    
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
     }
@@ -99,6 +115,22 @@ class VarDeclNode : AstNode {
 }
 
 class ProcDeclNode : AstNode {
+
+    string procName;
+    BlockNode block;
+
+    this(string procName, BlockNode block) {
+        this.procName = procName;
+        this.block = block;
+    }
+
+    string getProcName() {
+        return procName;
+    }
+
+    BlockNode getBlock() {
+        return block;
+    }
 
     override void accept(AstVisitor visitor) {
         visitor.visit(this);

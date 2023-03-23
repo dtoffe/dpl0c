@@ -1,6 +1,8 @@
 module parser;
 
+import std.conv;
 import ast;
+import error;
 import lexer;
 import token;
 
@@ -14,18 +16,19 @@ class Parser {
     }
 
     ProgramNode parseProgram() {
+        ProgramNode program = new ProgramNode();
         BlockNode block = parseBlock();
-        //match(TokenKind.EndOfFile);
+        program.block = block;
         if (currentToken.getTokenType() == TokenType.PERIOD) {
             currentToken = lexer.nextToken();
         } else {
-            // log error
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.PERIOD) ~
+                        " expected, but found " ~ to!string(currentToken.getTokenType()));
         }
         if (currentToken.getTokenType() != TokenType.EOF) {
-            // log error
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.EOF) ~
+                        " expected, but found " ~ to!string(currentToken.getTokenType()));
         }
-        ProgramNode program = new ProgramNode();
-        program.block = block;
         return program;
     }
 
@@ -46,36 +49,86 @@ class Parser {
     }
 
     ConstDeclNode[] parseConstDecls() {
-         ConstDeclNode[] constDecls = new ConstDeclNode[0];
-    //     if (currentToken.getTokenType() == TokenType.CONST) {
-    //         currentToken = lexer.nextToken();
-    //         while (currentToken.getTokenType() == TokenType.IDENT) {
-                
-    //             if (currentToken.getTokenType() == TokenType.IDENT) {
-    //                 ConstDeclNode[] newConstDecls = new ConstDeclNode[constDecls.length + 1];
-    //                 for (int i = 0; i < constDecls.length; i++) {
-    //                     newConstDecls[i] = constDecls[i];
-    //                 }
-    //                 newConstDecls[newConstDecls.length - 1] = parseConstDecl();
-    //                 constDecls = newConstDecls;
-    //             } else {
-    //                 break;
-    //             }
-                
-    //         }
-            
-    //     }
+        ConstDeclNode[] constDecls;
+        string name = "";
+        int value = 0;
+        int i = 0;
+        bool error = false;
+        while (currentToken.getTokenType() == TokenType.IDENT) {
+            name = currentToken.getLiteral();
+            currentToken = lexer.nextToken();
+            if (currentToken.getTokenType() != TokenType.EQUAL) {
+                ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.END) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+                error = true;
+            }
+            currentToken = lexer.nextToken();
+            if (currentToken.getTokenType() == TokenType.NUMBER) {
+                value = to!int(currentToken.getLiteral());
+            } else {
+                ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.NUMBER) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+                error = true;
+            }
+            if (!error) {
+                ConstDeclNode decl = new ConstDeclNode(name, value);
+                constDecls[i++] = decl;
+            }
+            error = false;
+            currentToken = lexer.nextToken();
+            if (currentToken.getTokenType() == TokenType.SEMICOLON) {
+                currentToken = lexer.nextToken();
+                break;
+            } else if (currentToken.getTokenType() != TokenType.COMMA) {
+                ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.COMMA) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));                
+            }
+            currentToken = lexer.nextToken();
+        }
         return constDecls;
     }
 
     VarDeclNode[] parseVarDecls() {
-        VarDeclNode[] varDecls = new VarDeclNode[0];
+        VarDeclNode[] varDecls;
+        string name = "";
+        int i = 0;
+        while (currentToken.getTokenType() == TokenType.IDENT) {
+            name = currentToken.getLiteral();
+            VarDeclNode decl = new VarDeclNode(name);
+            varDecls[i++] = decl;
+            currentToken = lexer.nextToken();
+            if (currentToken.getTokenType() == TokenType.SEMICOLON) {
+                currentToken = lexer.nextToken();
+                break;
+            } else if (currentToken.getTokenType() != TokenType.COMMA) {
+                ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.COMMA) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));                
+            }
+            currentToken = lexer.nextToken();
+        }
         return varDecls;
     }
 
     ProcDeclNode[] parseProcDecls() {
-        ProcDeclNode[] procDecls = new ProcDeclNode[0];
+        ProcDeclNode[] procDecls;
+        ProcDeclNode procDecl;
+        int i = 0;
+        while (currentToken.getTokenType() == TokenType.PROCEDURE) {
+            procDecl = parseProcDecl();
+            procDecls[i++] = procDecl;
+        }
         return procDecls;
+    }
+
+    ProcDeclNode parseProcDecl() {
+        ProcDeclNode procDecl;
+        string name = "";
+        int i = 0;
+        bool error = false;
+        while (currentToken.getTokenType() == TokenType.IDENT) {
+            
+        }
+        return procDecl;
     }
 
     StatementNode parseStatement() {
