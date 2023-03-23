@@ -4,8 +4,8 @@ import std.ascii;
 import std.file;
 import std.stdio;
 import std.string;
-import token;
 import error;
+import token;
 
 class Lexer {
 
