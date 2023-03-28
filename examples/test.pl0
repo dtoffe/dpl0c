@@ -1,6 +1,6 @@
 
-const max = 100;
+const max = 100, min = 10, avg = 55;
 
-var arg, ret;
+var arg, ret, nop;
 
 .

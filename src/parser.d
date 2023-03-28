@@ -1,6 +1,7 @@
 module parser;
 
 import std.conv;
+import std.stdio;
 import ast;
 import error;
 import lexer;
@@ -36,9 +37,11 @@ class Parser {
         BlockNode node = new BlockNode();
         currentToken = lexer.nextToken();
         if (currentToken.getTokenType() == TokenType.CONST) {
+            currentToken = lexer.nextToken();
             node.setConstDecls(parseConstDecls());
         }
         if (currentToken.getTokenType() == TokenType.VAR) {
+            currentToken = lexer.nextToken();
             node.setVarDecls(parseVarDecls());
         }
         if (currentToken.getTokenType() == TokenType.PROCEDURE) {
@@ -72,7 +75,7 @@ class Parser {
             }
             if (!error) {
                 ConstDeclNode decl = new ConstDeclNode(name, value);
-                constDecls[i++] = decl;
+                constDecls ~= decl;
             }
             error = false;
             currentToken = lexer.nextToken();
@@ -85,6 +88,7 @@ class Parser {
             }
             currentToken = lexer.nextToken();
         }
+        writeln("ConstDecls: ", constDecls.length);
         return constDecls;
     }
 
@@ -93,9 +97,10 @@ class Parser {
         string name = "";
         int i = 0;
         while (currentToken.getTokenType() == TokenType.IDENT) {
+            writeln("Parsing token: " ~ currentToken.toString());
             name = currentToken.getLiteral();
             VarDeclNode decl = new VarDeclNode(name);
-            varDecls[i++] = decl;
+            varDecls ~= decl;
             currentToken = lexer.nextToken();
             if (currentToken.getTokenType() == TokenType.SEMICOLON) {
                 currentToken = lexer.nextToken();

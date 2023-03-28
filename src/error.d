@@ -51,7 +51,9 @@ static class ErrorManager {
     }
 
     static void printErrors() {
-        writeln("Compiler errors:");
+        if (errorCount > 0) {
+            writeln("Compiler errors:");
+        }
         foreach (error; errors[0..errorCount]) {
             writeln(error.type, ": ", error.level, ": ", error.message);
         }
