@@ -144,8 +144,21 @@ abstract class StatementNode : AstNode {
 
 class AssignNode : StatementNode {
 
-    string name;
+    string identName;
     ExpressionNode expression;
+
+    this(string identName, ExpressionNode expression) {
+        this.identName = identName;
+        this.expression = expression;
+    }
+
+    string getIdentName() {
+        return identName;
+    }
+
+    ExpressionNode getExpression() {
+        return expression;
+    }
 
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
@@ -155,6 +168,16 @@ class AssignNode : StatementNode {
 
 class CallNode : StatementNode {
 
+    string identName;
+
+    this(string identName) {
+        this.identName = identName;
+    }
+
+    string getIdentName() {
+        return identName;
+    }
+    
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
     }

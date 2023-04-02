@@ -120,25 +120,226 @@ class Parser {
         int i = 0;
         while (currentToken.getTokenType() == TokenType.PROCEDURE) {
             procDecl = parseProcDecl();
-            procDecls[i++] = procDecl;
+            procDecls ~= procDecl;
         }
         return procDecls;
     }
 
     ProcDeclNode parseProcDecl() {
         ProcDeclNode procDecl;
-        string name = "";
+        string procName = "";
         int i = 0;
         bool error = false;
-        while (currentToken.getTokenType() == TokenType.IDENT) {
-            
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.IDENT) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.IDENT) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType())); 
+        }
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.SEMICOLON) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.SEMICOLON) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType())); 
+        }
+        currentToken = lexer.nextToken();
+        BlockNode block = parseBlock();
+        procDecl = new ProcDeclNode(procName, block);
+        if (currentToken.getTokenType() != TokenType.SEMICOLON) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.SEMICOLON) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType())); 
         }
         return procDecl;
     }
 
     StatementNode parseStatement() {
-        StatementNode statNode = null; //new StatementNode();
+        StatementNode statNode;
+        switch (currentToken.getTokenType()) {
+            case TokenType.IDENT:
+                statNode = parseAssign();
+                break;
+            case TokenType.CALL:
+                statNode = parseCall();
+                break;
+            case TokenType.READ:
+                statNode = parseRead();
+                break;
+            case TokenType.WRITE:
+                statNode = parseWrite();
+                break;
+            case TokenType.BEGIN:
+                statNode = parseBegin();
+                break;
+            case TokenType.IF:
+                statNode = parseIf();
+                break;
+            case TokenType.WHILE:
+                statNode = parseWhile();
+                break;
+            default:
+                ErrorManager.addParserError(ErrorLevel.ERROR, "Token " ~ to!string(currentToken.getTokenType()) ~
+                        " unexpected at the start of a statement.");
+                break;
+        }
         return statNode;
+    }
+
+    AssignNode parseAssign() {
+        AssignNode assign;
+        string name = "";
+        name = currentToken.getLiteral();
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.EQUAL) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.EQUAL) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+
+        }
+        currentToken = lexer.nextToken();
+        ExpressionNode exp = parseExpression();
+        assign = new AssignNode(name, exp);
+        if (currentToken.getTokenType() != TokenType.SEMICOLON) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.SEMICOLON) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+        }
+        return assign;
+    }
+
+    CallNode parseCall() {
+        CallNode call;
+        string name = "";
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.IDENT) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.IDENT) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+        }
+        name = currentToken.getLiteral();
+        call = new CallNode(name);
+        return call;
+    }
+
+    ReadNode parseRead() {
+        ReadNode read;
+        string name = "";
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.IDENT) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.IDENT) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+        }
+        name = currentToken.getLiteral();
+        read = new ReadNode(name);
+        return read;
+    }
+
+    WriteNode parseWrite() {
+        WriteNode write;
+        ExpressionNode exp;
+        // write.setName(currentToken.getLiteral());
+        // currentToken = lexer.nextToken();
+        // if (currentToken.getTokenType() != TokenType.SEMICOLON) {
+            
+        //     ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.SEMICOLON) ~
+        //                     " expected, but found " ~ to!string(currentToken.getTokenType()));
+
+        // }
+        // currentToken = lexer.nextToken();
+        // return write;
+    }
+
+    BeginNode parseBegin() {
+        BeginNode begin = new BeginNode();
+        begin.setName(currentToken.getLiteral());
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.SEMICOLON) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.SEMICOLON) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+
+        }
+        currentToken = lexer.nextToken();
+        return begin;
+    }
+
+    IfNode parseIf() {
+        IfNode ifNode = new IfNode();
+        ifNode.setName(currentToken.getLiteral());
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.LPAREN) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.LPAREN) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+        }
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.RPAREN) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.RPAREN) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+        }
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.THEN) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.THEN) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+        }
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.LBRACE) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.LBRACE) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+        }
+        currentToken = lexer.nextToken();
+        BlockNode block = parseBlock();
+        if (currentToken.getTokenType() != TokenType.RBRACE) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.RBRACE) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+        }
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.ELSE) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.ELSE) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+        }
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.SEMICOLON) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.SEMICOLON) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+        }
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.END) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.END) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+        }
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.SEMICOLON) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.SEMICOLON) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+        }
+        currentToken = lexer.nextToken();
+        return ifNode;
+    }
+
+    WhileNode parseWhile() {
+        WhileNode whileNode = new WhileNode();
+        whileNode.setName(currentToken.getLiteral());
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.LPAREN) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.LPAREN) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+        }
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.RPAREN) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.RPAREN) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+        }
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.THEN) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.THEN) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+        }
+        currentToken = lexer.nextToken();
+        BlockNode block = parseBlock();
+        if (currentToken.getTokenType() != TokenType.END) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.END) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+        }
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.SEMICOLON) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.SEMICOLON) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()));
+        }
+        currentToken = lexer.nextToken();
+        return whileNode;
     }
 
 }
