@@ -39,12 +39,14 @@ class PrettyPrinter : AstVisitor {
             indent();
             foreach (index, constant; node.getConstDecls()) {
                 constant.accept(this);
-                if (index < node.getConstDecls().length) {
+                //writeln(index, ",", node.getConstDecls().length);
+                if (index + 1 < node.getConstDecls().length) {
                     writeln(",");
+                } else {
+                    writeln(";");
                 }
             }
             unindent();
-            writeln(";");
             writeln("");
         }
         if (node.getVarDecls().length > 0) {
@@ -52,18 +54,19 @@ class PrettyPrinter : AstVisitor {
             indent();
             foreach (index, variable; node.getVarDecls()) {
                 variable.accept(this);
-                if (index < node.getVarDecls().length) {
+                if (index + 1 < node.getVarDecls().length) {
                     writeln(",");
+                } else {
+                    writeln(";");
                 }
             }
             unindent();
-            writeln(";");
             writeln("");
         }
-        // foreach (procedure; node.getProcDecls()) {
-        //     procedure.accept(this);
-        // }
-        // node.statement.accept(this);
+        foreach (index, procedure; node.getProcDecls()) {
+            procedure.accept(this);
+        }
+        node.statement.accept(this);
     }
 
     void visit(ConstDeclNode node) {
@@ -77,11 +80,14 @@ class PrettyPrinter : AstVisitor {
     }
 
     void visit(ProcDeclNode node) {
-        indent();
+        writeln("procedure ", node.getProcName(), ";");
+        node.getBlock.accept(this);
+        writeln(";");
+        writeln();
     }
 
     void visit(StatementNode node) {
-        indent();
+        writeln("statement");
     }
 
     void visit(AssignNode node) {
@@ -89,11 +95,11 @@ class PrettyPrinter : AstVisitor {
     }
 
     void visit(CallNode node) {
-        indent();
+        writeln("call ", node.getIdentName());
     }
 
     void visit(ReadNode node) {
-        indent();
+        writeln("read ", node.getVarName());
     }
 
     void visit(WriteNode node) {

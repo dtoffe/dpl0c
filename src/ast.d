@@ -186,6 +186,16 @@ class CallNode : StatementNode {
 
 class ReadNode : StatementNode {
 
+    string varName;
+
+    this(string varName) {
+        this.varName = varName;
+    }
+
+    string getVarName() {
+        return varName;
+    }
+
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
     }
@@ -196,6 +206,14 @@ class WriteNode : StatementNode {
 
     ExpressionNode expression;
 
+    this(ExpressionNode expression) {
+        this.expression = expression;
+    }
+
+    ExpressionNode getExpression() {
+        return expression;
+    }
+
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
     }
@@ -204,6 +222,16 @@ class WriteNode : StatementNode {
 
 class BeginEndNode : StatementNode {
 
+    StatementNode[] statements;
+
+    this(StatementNode[] statements) {
+        this.statements = statements;
+    }
+
+    StatementNode[] getStatements() {
+        return statements;
+    }
+    
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
     }

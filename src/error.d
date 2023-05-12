@@ -69,11 +69,13 @@ static class ErrorManager {
 
     static void addLexerError(ErrorLevel level, string message, int line, int column) {
         addError(ErrorType.LEXER, level, message ~ " TokenType: " ~ to!string(TokenType.INVALID) ~
-                " at line: " ~ to!string(line) ~ " column: " ~ to!string(column) ~".\n");
+                " at line: " ~ to!string(line) ~ " column: " ~ to!string(column) ~ ".\n");
     }
 
-    static void addParserError(ErrorLevel level, string message) {
-        addError(ErrorType.PARSER, level, message);
+    static void addParserError(ErrorLevel level, string message, Token token) {
+        addError(ErrorType.PARSER, level, message ~
+                " at line: " ~ to!string(token.getLine()) ~ " column: " ~ to!string(token.getColumn()) ~
+                " lexeme: " ~ to!string(token.getLiteral()) ~ ".\n");
     }
 
     static void addSemanticError(ErrorLevel level, string message) {
