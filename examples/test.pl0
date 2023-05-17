@@ -3,4 +3,8 @@ const max = 100, min = 10, avg = 55;
 
 var arg, ret, nop;
 
-.
+procedure readint;
+var i;
+read i;
+
+begin     call readint end .

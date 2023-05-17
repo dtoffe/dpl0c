@@ -175,7 +175,7 @@ class Parser {
                 //statNode = parseWrite();
                 break;
             case TokenType.BEGIN:
-                //statNode = parseBegin();
+                statNode = parseBegin();
                 break;
             case TokenType.IF:
                 //statNode = parseIf();
@@ -191,15 +191,15 @@ class Parser {
         return statNode;
     }
 
-    // StatementNode[] parseStatements() {
-    //     StatementNode[] statements = new StatementNode[0];
-    //     statements ~= parseStatement();
-    //     while (currentToken.getTokenType() == TokenType.SEMICOLON) {
-    //         currentToken = lexer.nextToken();
-    //         statements ~= parseStatement();
-    //     }
-    //     return statements;
-    // }
+    StatementNode[] parseStatements() {
+        StatementNode[] statements = new StatementNode[0];
+        statements ~= parseStatement();
+        while (currentToken.getTokenType() == TokenType.SEMICOLON) {
+            currentToken = lexer.nextToken();
+            statements ~= parseStatement();
+        }
+        return statements;
+    }
 
     // AssignNode parseAssign() {
     //     AssignNode assign;
@@ -262,13 +262,21 @@ class Parser {
     //     return write;
     // }
 
-    // BeginEndNode parseBegin() {
-    //     BeginEndNode begin;
-    //     currentToken = lexer.nextToken();
-    //     StatementNode[] stats = parseStatements();
-    //     begin = new BeginEndNode(stats);
-    //     return begin;
-    // }
+    BeginEndNode parseBegin() {
+        BeginEndNode beginNode;
+        StatementNode stat;
+        StatementNode[] stats;
+        currentToken = lexer.nextToken();
+        stats = parseStatements(); 
+        if (currentToken.getTokenType() != TokenType.END) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.END) ~
+                " expected, but found " ~ to!string(currentToken.getTokenType()) ~ " in parseBegin",
+                currentToken); 
+        }
+        currentToken = lexer.nextToken();
+        beginNode = new BeginEndNode(stats);
+        return beginNode;
+    }
 
     // IfNode parseIf() {
     //     IfNode ifNode = new IfNode();

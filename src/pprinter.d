@@ -81,25 +81,27 @@ class PrettyPrinter : AstVisitor {
 
     void visit(ProcDeclNode node) {
         writeln("procedure ", node.getProcName(), ";");
-        node.getBlock.accept(this);
+        node.getBlock().accept(this);
         writeln(";");
         writeln();
     }
 
-    void visit(StatementNode node) {
-        writeln("statement");
-    }
+    // void visit(StatementNode node) {
+    //     writeln("statement");
+    // }
 
     void visit(AssignNode node) {
         indent();
     }
 
     void visit(CallNode node) {
-        writeln("call ", node.getIdentName());
+        printIndent();
+        write("call ", node.getIdentName());
     }
 
     void visit(ReadNode node) {
-        writeln("read ", node.getVarName());
+        printIndent();
+        write("read ", node.getVarName());
     }
 
     void visit(WriteNode node) {
@@ -107,7 +109,18 @@ class PrettyPrinter : AstVisitor {
     }
 
     void visit(BeginEndNode node) {
+        writeln("begin");
         indent();
+        foreach (index, statement; node.getStatements()) {
+            statement.accept(this);
+            if (index + 1 < node.getStatements().length) {
+                writeln(";");
+            } else {
+                unindent();
+                writeln();
+                writeln("end");
+            }
+        }
     }
 
     void visit(IfThenNode node) {

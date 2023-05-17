@@ -316,7 +316,7 @@ interface AstVisitor {
     void visit(ConstDeclNode node);
     void visit(VarDeclNode node);
     void visit(ProcDeclNode node);
-    void visit(StatementNode node);
+    //void visit(StatementNode node); // abstract
     void visit(AssignNode node);
     void visit(CallNode node);
     void visit(ReadNode node);
