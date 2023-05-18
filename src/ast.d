@@ -261,11 +261,91 @@ class WhileDoNode : StatementNode {
 
 }
 
-abstract class ExpressionNode : AstNode {
+abstract class ConditionNode : AstNode {
+    
+}
+
+class OddCondNode : ConditionNode {
+
+    ExpressionNode expr;
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    ExpressionNode getExpr() {
+        return expr;
+    }
 
 }
 
-class NumberNode : ExpressionNode {
+class ComparisonNode : ConditionNode {
+    
+    ExpressionNode left;
+    ExpressionNode right;
+    string operator;
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    ExpressionNode getLeft() {
+        return left;
+    }
+
+    ExpressionNode getRight() {
+        return right;
+    }
+
+    string getOperator() {
+        return operator;
+    }
+
+}
+
+class ExpressionNode : AstNode {
+    
+    TermNode[] terms;
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    TermNode[] getTerms() {
+        return terms;
+    }
+
+}
+
+class TermNode : AstNode {
+
+    ExpressionNode left;
+    ExpressionNode right;
+    string operator;
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    ExpressionNode getLeft() {
+        return left;
+    }
+
+    ExpressionNode getRight() {
+        return right;
+    }
+
+    string getOperator() {
+        return operator;
+    }
+
+}
+
+abstract class FactorNode : AstNode {
+
+}
+
+class NumberNode : FactorNode {
 
     int value;
 
@@ -273,9 +353,13 @@ class NumberNode : ExpressionNode {
         visitor.visit(this);
     }
 
+    int getValue() {
+        return value;
+    }
+
 }
 
-class VariableNode : ExpressionNode {
+class VariableNode : FactorNode {
     
     string name;
 
@@ -283,28 +367,22 @@ class VariableNode : ExpressionNode {
         visitor.visit(this);
     }
 
+    string getName() {
+        return name;
+    }
+
 }
 
-class BinaryOpNode : ExpressionNode {
-
-    ExpressionNode left;
-    ExpressionNode right;
-    string operation;
+class ParenExpNode : FactorNode {
+    
+    ExpressionNode expression;
 
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
     }
 
-}
-
-class ConditionNode : ExpressionNode {
-
-    ExpressionNode left;
-    ExpressionNode right;
-    string operation;
-
-    override void accept(AstVisitor visitor) {
-        visitor.visit(this);
+    ExpressionNode getExpression() {
+        return expression;
     }
 
 }
@@ -324,10 +402,14 @@ interface AstVisitor {
     void visit(BeginEndNode node);
     void visit(IfThenNode node);
     void visit(WhileDoNode node);
+    //void visit(ConditionNode node); // abstract
+    void visit(OddCondNode node);
+    void visit(ComparisonNode node);
     void visit(ExpressionNode node);
+    void visit(TermNode node);
+    //void visit(FactorNode node); // abstract
     void visit(NumberNode node);
     void visit(VariableNode node);
-    void visit(BinaryOpNode node);
-    void visit(ConditionNode node);
+    void visit(ParenExpNode node);
 
 }
