@@ -364,4 +364,77 @@ class Parser {
     //     return whileNode;
     // }
 
+    ExpressionNode parseExpression() {
+        ExpressionNode expressionNode;
+        TokenType operator;
+        TermNode termNode;
+        // First (unary) operator is optional, if not present use INVALID token type
+        if (currentToken.getTokenType() == TokenType.PLUS || currentToken.getTokenType() == TokenType.MINUS) {
+            operator = currentToken.getTokenType();
+        } else {
+            operator = TokenType.INVALID;
+        }
+        currentToken = lexer.nextToken();
+        termNode = parseTerm();
+        expressionNode = new ExpressionNode(operator, termNode);
+        // Now repeat
+        while (currentToken.getTokenType() == TokenType.PLUS || currentToken.getTokenType() == TokenType.MINUS) {
+            operator = currentToken.getTokenType();
+            currentToken = lexer.nextToken();
+            termNode = parseTerm();
+            expressionNode.addOpTerm(operator, termNode);
+        }
+        return expressionNode;
+    }
+
+    TermNode parseTerm() {
+        TermNode termNode;
+        TokenType operator;
+        FactorNode factorNode;
+        if (currentToken.getTokenType() == TokenType.MULT || currentToken.getTokenType() == TokenType.DIV) {
+            operator = currentToken.getTokenType();
+        } else {
+            operator = TokenType.INVALID;
+        }
+        currentToken = lexer.nextToken();
+        factorNode = parseFactor();
+        termNode = new TermNode(operator, factorNode);
+        while (currentToken.getTokenType() == TokenType.MULT || currentToken.getTokenType() == TokenType.DIV) {
+            operator = currentToken.getTokenType();
+            currentToken = lexer.nextToken();
+            factorNode = parseFactor();
+            termNode.addOpFactor(operator, factorNode);
+        }
+        return termNode;
+    }
+
+    FactorNode parseFactor() {
+        FactorNode factorNode;
+        switch (currentToken.getTokenType()) {
+            case TokenType.VAR:
+                factorNode = new VariableNode(currentToken.getLiteral());
+                currentToken = lexer.nextToken();
+                break;
+            case TokenType.NUMBER:
+                factorNode = new NumberNode(currentToken.getLiteral());
+                currentToken = lexer.nextToken();
+                break;
+            case TokenType.LPAREN:
+                currentToken = lexer.nextToken();
+                ExpressionNode expressionNode = parseExpression();
+                factorNode = new ParenExpNode(expressionNode);
+                if (currentToken.getTokenType() != TokenType.RPAREN) {
+                    ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.RPAREN) ~
+                        " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
+
+                }
+                currentToken = lexer.nextToken();
+                break;
+            default:
+                ErrorManager.addParserError(ErrorLevel.ERROR, "Token " ~ to!string(currentToken.getTokenType()) ~
+                    " unexpected at the start of a factor in parseFactor.", currentToken);
+        }
+        return factorNode;
+    }
+
 }

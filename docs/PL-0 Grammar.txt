@@ -16,7 +16,7 @@ statement = [ ident ":=" expression
 condition = "odd" expression |
             expression ( "=" | "#" | "<" | "<=" | ">" | ">=" ) expression ;
 
-expression = [ "+"  |"-" ] term { ( "+" | "-" ) term } ;
+expression = [ "+" | "-" ] term { ( "+" | "-" ) term } ;
 
 term = factor { ( "*" | "/" ) factor } ;
 

@@ -1,5 +1,8 @@
 module ast;
 
+import std.conv;
+import token;
+
 abstract class AstNode {
 
     abstract void accept(AstVisitor visitor);
@@ -305,38 +308,60 @@ class ComparisonNode : ConditionNode {
 
 class ExpressionNode : AstNode {
     
-    TermNode[] terms;
+    struct OpTermPair {
+        TokenType operator;
+        TermNode term;
+    }
+    
+    OpTermPair[] opTerms;
 
+    this(TokenType operator, TermNode term) {
+        opTerms = new OpTermPair[0];
+        OpTermPair opTerm = OpTermPair(operator, term);
+        this.opTerms ~= opTerm;
+    }
+
+    void addOpTerm(TokenType operator, TermNode term) {
+        OpTermPair opTerm = OpTermPair(operator, term);
+        this.opTerms ~= opTerm;
+    }
+    
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
     }
 
-    TermNode[] getTerms() {
-        return terms;
+    OpTermPair[] getOpTerms() {
+        return opTerms;
     }
 
 }
 
 class TermNode : AstNode {
 
-    ExpressionNode left;
-    ExpressionNode right;
-    string operator;
+    struct OpFactorPair {
+        TokenType operator;
+        FactorNode factor;
+    }
+
+    OpFactorPair[] opFactors;
+
+    this(TokenType operator, FactorNode factor) {
+        this.opFactors = new OpFactorPair[0];
+        OpFactorPair opFactor = OpFactorPair(operator, factor);
+        this.opFactors ~= opFactor;
+    }
+
+    void addOpFactor(TokenType operator, FactorNode factor) {
+        OpFactorPair opFactor = OpFactorPair(operator, factor);
+        this.opFactors ~= opFactor;
+    }
 
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
     }
 
-    ExpressionNode getLeft() {
-        return left;
-    }
-
-    ExpressionNode getRight() {
-        return right;
-    }
-
-    string getOperator() {
-        return operator;
+    OpFactorPair[] getOpFactors() {
+        return opFactors;
     }
 
 }
@@ -347,14 +372,22 @@ abstract class FactorNode : AstNode {
 
 class NumberNode : FactorNode {
 
-    int value;
+    string value;
+
+    this(string value) {
+        this.value = value;
+    }
 
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
     }
 
-    int getValue() {
+    string getValue() {
         return value;
+    }
+
+    int getNumberValue() {
+        return to!int(value);
     }
 
 }
@@ -362,6 +395,10 @@ class NumberNode : FactorNode {
 class VariableNode : FactorNode {
     
     string name;
+
+    this(string name) {
+        this.name = name;
+    }
 
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
@@ -376,6 +413,10 @@ class VariableNode : FactorNode {
 class ParenExpNode : FactorNode {
     
     ExpressionNode expression;
+
+    this(ExpressionNode expression) {
+        this.expression = expression;
+    }
 
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
