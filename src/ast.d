@@ -244,11 +244,23 @@ class BeginEndNode : StatementNode {
 class IfThenNode : StatementNode {
 
     ConditionNode condition;
-    StatementNode ifStatement;
-    StatementNode elseStatement;
+    StatementNode statement;
+
+    this(ConditionNode condition, StatementNode statement) {
+        this.condition = condition;
+        this.statement = statement;
+    }
 
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
+    }
+
+    ConditionNode getCondition() {
+        return condition;
+    }
+
+    StatementNode getStatement() {
+        return statement;
     }
 
 }
@@ -258,10 +270,23 @@ class WhileDoNode : StatementNode {
     ConditionNode condition;
     StatementNode statement;
 
+    this(ConditionNode condition, StatementNode statement) {
+        this.condition = condition;
+        this.statement = statement;
+    }
+
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
     }
 
+    ConditionNode getCondition() {
+        return condition;
+    }
+
+    StatementNode getStatement() {
+        return statement;
+    }
+    
 }
 
 abstract class ConditionNode : AstNode {
@@ -271,6 +296,10 @@ abstract class ConditionNode : AstNode {
 class OddCondNode : ConditionNode {
 
     ExpressionNode expr;
+
+    this(ExpressionNode expr) {
+        this.expr = expr;
+    }
 
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
@@ -286,7 +315,13 @@ class ComparisonNode : ConditionNode {
     
     ExpressionNode left;
     ExpressionNode right;
-    string operator;
+    TokenType relOperator;
+
+    this(ExpressionNode left, ExpressionNode right, TokenType relOperator) {
+        this.left = left;
+        this.right = right;
+        this.relOperator = relOperator;
+    }
 
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
@@ -300,8 +335,8 @@ class ComparisonNode : ConditionNode {
         return right;
     }
 
-    string getOperator() {
-        return operator;
+    TokenType getRelOperator() {
+        return relOperator;
     }
 
 }

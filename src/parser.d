@@ -278,91 +278,65 @@ class Parser {
         return beginNode;
     }
 
-    // IfNode parseIf() {
-    //     IfNode ifNode = new IfNode();
-    //     ifNode.setName(currentToken.getLiteral());
-    //     currentToken = lexer.nextToken();
-    //     if (currentToken.getTokenType() != TokenType.LPAREN) {
-    //         ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.LPAREN) ~
-    //                         " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
-    //     }
-    //     currentToken = lexer.nextToken();
-    //     if (currentToken.getTokenType() != TokenType.RPAREN) {
-    //         ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.RPAREN) ~
-    //                         " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
-    //     }
-    //     currentToken = lexer.nextToken();
-    //     if (currentToken.getTokenType() != TokenType.THEN) {
-    //         ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.THEN) ~
-    //                         " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
-    //     }
-    //     currentToken = lexer.nextToken();
-    //     if (currentToken.getTokenType() != TokenType.LBRACE) {
-    //         ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.LBRACE) ~
-    //                         " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
-    //     }
-    //     currentToken = lexer.nextToken();
-    //     BlockNode block = parseBlock();
-    //     if (currentToken.getTokenType() != TokenType.RBRACE) {
-    //         ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.RBRACE) ~
-    //                         " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
-    //     }
-    //     currentToken = lexer.nextToken();
-    //     if (currentToken.getTokenType() != TokenType.ELSE) {
-    //         ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.ELSE) ~
-    //                         " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
-    //     }
-    //     currentToken = lexer.nextToken();
-    //     if (currentToken.getTokenType() != TokenType.SEMICOLON) {
-    //         ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.SEMICOLON) ~
-    //                         " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
-    //     }
-    //     currentToken = lexer.nextToken();
-    //     if (currentToken.getTokenType() != TokenType.END) {
-    //         ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.END) ~
-    //                         " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
-    //     }
-    //     currentToken = lexer.nextToken();
-    //     if (currentToken.getTokenType() != TokenType.SEMICOLON) {
-    //         ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.SEMICOLON) ~
-    //                         " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
-    //     }
-    //     currentToken = lexer.nextToken();
-    //     return ifNode;
-    // }
+    IfThenNode parseIfThen() {
+        IfThenNode ifThenNode;
+        ConditionNode condition;
+        StatementNode statement;
+        currentToken = lexer.nextToken();
+        condition = parseCondition();
+        if (currentToken.getTokenType() == TokenType.THEN) {
+            currentToken = lexer.nextToken();
+            statement = parseStatement();
+            ifThenNode = new IfThenNode(condition, statement);
+        } else {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.THEN) ~
+                " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
+        }
+        return ifThenNode;
+    }
 
-    // WhileNode parseWhile() {
-    //     WhileNode whileNode = new WhileNode();
-    //     whileNode.setName(currentToken.getLiteral());
-    //     currentToken = lexer.nextToken();
-    //     if (currentToken.getTokenType() != TokenType.LPAREN) {
-    //         ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.LPAREN) ~
-    //                         " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
-    //     }
-    //     currentToken = lexer.nextToken();
-    //     if (currentToken.getTokenType() != TokenType.RPAREN) {
-    //         ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.RPAREN) ~
-    //                         " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
-    //     }
-    //     currentToken = lexer.nextToken();
-    //     if (currentToken.getTokenType() != TokenType.THEN) {
-    //         ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.THEN) ~
-    //                         " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
-    //     }
-    //     currentToken = lexer.nextToken();
-    //     BlockNode block = parseBlock();
-    //     if (currentToken.getTokenType() != TokenType.END) {
-    //         ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.END) ~
-    //                         " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
-    //     }
-    //     currentToken = lexer.nextToken();
-    //     if (currentToken.getTokenType() != TokenType.SEMICOLON) {
-    //         ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.SEMICOLON) ~
-    //                         " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
-    //     }
-    //     currentToken = lexer.nextToken();
-    //     return whileNode;
-    // }
+    WhileDoNode parseWhile() {
+        WhileDoNode whileDoNode;
+        ConditionNode condition;
+        StatementNode statement;
+        currentToken = lexer.nextToken();
+        condition = parseCondition();
+        if (currentToken.getTokenType() == TokenType.DO) {
+            currentToken = lexer.nextToken();
+            statement = parseStatement();
+            whileDoNode = new WhileDoNode(condition, statement);
+        } else {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.DO) ~
+                " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
+        }
+        return whileDoNode;
+    }
+
+    ConditionNode parseCondition() {
+        ConditionNode condition;
+        if (currentToken.getTokenType() == TokenType.ODD) {
+            currentToken = lexer.nextToken();
+            ExpressionNode expr = parseExpression();
+            condition = new OddCondNode(expr);
+        } else {
+            ExpressionNode left = parseExpression();
+            Token maybeRelOpToken = currentToken;
+            if (currentToken.getTokenType() == TokenType.EQUAL ||
+                    currentToken.getTokenType() == TokenType.NOTEQUAL ||
+                    currentToken.getTokenType() == TokenType.LESSER ||
+                    currentToken.getTokenType() == TokenType.LESSEREQ ||
+                    currentToken.getTokenType() == TokenType.GREATER ||
+                    currentToken.getTokenType() == TokenType.GREATEREQ) {
+                currentToken = lexer.nextToken();
+                ExpressionNode right = parseExpression();
+                condition = new ComparisonNode(left, right, maybeRelOpToken.getTokenType());
+            } else {
+                ErrorManager.addParserError(ErrorLevel.ERROR, "Relational Operation" ~
+                    " expected, but found " ~ to!string(maybeRelOpToken.getTokenType()), maybeRelOpToken);
+            }
+        }
+        return condition;
+    }
 
     ExpressionNode parseExpression() {
         ExpressionNode expressionNode;
