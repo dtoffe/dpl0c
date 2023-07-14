@@ -163,7 +163,7 @@ class Parser {
         StatementNode statNode;
         switch (currentToken.getTokenType()) {
             case TokenType.IDENT:
-                //statNode = parseAssign();
+                statNode = parseAssign();
                 break;
             case TokenType.CALL:
                 statNode = parseCall();
@@ -172,16 +172,16 @@ class Parser {
                 statNode = parseRead();
                 break;
             case TokenType.WRITE:
-                //statNode = parseWrite();
+                statNode = parseWrite();
                 break;
             case TokenType.BEGIN:
                 statNode = parseBegin();
                 break;
             case TokenType.IF:
-                //statNode = parseIf();
+                statNode = parseIfThen();
                 break;
             case TokenType.WHILE:
-                //statNode = parseWhile();
+                statNode = parseWhileDo();
                 break;
             default:
                 ErrorManager.addParserError(ErrorLevel.ERROR, "Token " ~ to!string(currentToken.getTokenType()) ~
@@ -201,25 +201,20 @@ class Parser {
         return statements;
     }
 
-    // AssignNode parseAssign() {
-    //     AssignNode assign;
-    //     string name = "";
-    //     name = currentToken.getLiteral();
-    //     currentToken = lexer.nextToken();
-    //     if (currentToken.getTokenType() != TokenType.EQUAL) {
-    //         ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.EQUAL) ~
-    //                         " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
-
-    //     }
-    //     currentToken = lexer.nextToken();
-    //     ExpressionNode exp = parseExpression();
-    //     assign = new AssignNode(name, exp);
-    //     if (currentToken.getTokenType() != TokenType.SEMICOLON) {
-    //         ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.SEMICOLON) ~
-    //                         " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
-    //     }
-    //     return assign;
-    // }
+    AssignNode parseAssign() {
+        AssignNode assign;
+        ExpressionNode expr;
+        string name = currentToken.getLiteral();
+        currentToken = lexer.nextToken();
+        if (currentToken.getTokenType() != TokenType.ASSIGN) {
+            ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.ASSIGN) ~
+                            " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
+        }
+        currentToken = lexer.nextToken();
+        expr = parseExpression();
+        assign = new AssignNode(name, expr);
+        return assign;
+    }
 
     CallNode parseCall() {
         CallNode call;
@@ -253,14 +248,14 @@ class Parser {
         return read;
     }
 
-    // WriteNode parseWrite() {
-    //     WriteNode write;
-    //     ExpressionNode exp;
-    //     currentToken = lexer.nextToken();
-    //     exp = parseExpression();
-    //     write = new WriteNode(exp);
-    //     return write;
-    // }
+    WriteNode parseWrite() {
+        WriteNode write;
+        ExpressionNode expr;
+        currentToken = lexer.nextToken();
+        expr = parseExpression();
+        write = new WriteNode(expr);
+        return write;
+    }
 
     BeginEndNode parseBegin() {
         BeginEndNode beginNode;
@@ -295,7 +290,7 @@ class Parser {
         return ifThenNode;
     }
 
-    WhileDoNode parseWhile() {
+    WhileDoNode parseWhileDo() {
         WhileDoNode whileDoNode;
         ConditionNode condition;
         StatementNode statement;

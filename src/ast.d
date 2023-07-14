@@ -251,16 +251,16 @@ class IfThenNode : StatementNode {
         this.statement = statement;
     }
 
-    override void accept(AstVisitor visitor) {
-        visitor.visit(this);
-    }
-
     ConditionNode getCondition() {
         return condition;
     }
 
     StatementNode getStatement() {
         return statement;
+    }
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
     }
 
 }
@@ -275,10 +275,6 @@ class WhileDoNode : StatementNode {
         this.statement = statement;
     }
 
-    override void accept(AstVisitor visitor) {
-        visitor.visit(this);
-    }
-
     ConditionNode getCondition() {
         return condition;
     }
@@ -286,7 +282,11 @@ class WhileDoNode : StatementNode {
     StatementNode getStatement() {
         return statement;
     }
-    
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
+    }
+
 }
 
 abstract class ConditionNode : AstNode {
@@ -301,12 +301,12 @@ class OddCondNode : ConditionNode {
         this.expr = expr;
     }
 
-    override void accept(AstVisitor visitor) {
-        visitor.visit(this);
-    }
-
     ExpressionNode getExpr() {
         return expr;
+    }
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
     }
 
 }
@@ -323,10 +323,6 @@ class ComparisonNode : ConditionNode {
         this.relOperator = relOperator;
     }
 
-    override void accept(AstVisitor visitor) {
-        visitor.visit(this);
-    }
-
     ExpressionNode getLeft() {
         return left;
     }
@@ -337,6 +333,10 @@ class ComparisonNode : ConditionNode {
 
     TokenType getRelOperator() {
         return relOperator;
+    }
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
     }
 
 }
@@ -361,12 +361,12 @@ class ExpressionNode : AstNode {
         this.opTerms ~= opTerm;
     }
     
-    override void accept(AstVisitor visitor) {
-        visitor.visit(this);
-    }
-
     OpTermPair[] getOpTerms() {
         return opTerms;
+    }
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
     }
 
 }
@@ -391,12 +391,12 @@ class TermNode : AstNode {
         this.opFactors ~= opFactor;
     }
 
-    override void accept(AstVisitor visitor) {
-        visitor.visit(this);
-    }
-
     OpFactorPair[] getOpFactors() {
         return opFactors;
+    }
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
     }
 
 }
@@ -413,16 +413,16 @@ class NumberNode : FactorNode {
         this.value = value;
     }
 
-    override void accept(AstVisitor visitor) {
-        visitor.visit(this);
-    }
-
     string getValue() {
         return value;
     }
 
     int getNumberValue() {
         return to!int(value);
+    }
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
     }
 
 }
@@ -435,12 +435,12 @@ class VariableNode : FactorNode {
         this.name = name;
     }
 
-    override void accept(AstVisitor visitor) {
-        visitor.visit(this);
-    }
-
     string getName() {
         return name;
+    }
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
     }
 
 }
@@ -453,12 +453,12 @@ class ParenExpNode : FactorNode {
         this.expression = expression;
     }
 
-    override void accept(AstVisitor visitor) {
-        visitor.visit(this);
-    }
-
     ExpressionNode getExpression() {
         return expression;
+    }
+
+    override void accept(AstVisitor visitor) {
+        visitor.visit(this);
     }
 
 }
