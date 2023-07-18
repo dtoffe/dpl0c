@@ -7,4 +7,9 @@ procedure readint;
 var i;
 read i;
 
-begin     call readint end .
+begin
+
+if i > 0 then arg := 12;
+while i > 0 do begin i := i - 1; write i end;
+    call readint
+     end .

@@ -13,7 +13,7 @@ enum VERSION = "0.0.1";
 void main(string[] args) {
     writefln("\nThe D PL/0 Compiler v. %s", VERSION);
 
-    string sourceFileName = "../examples/test.pl0";
+    string sourceFileName = "../examples/primes.pl0";
     Lexer lex = new Lexer(sourceFileName);
     // Token tok = lex.nextToken();
     // while (tok.getTokenType()  != TokenType.EOF) {

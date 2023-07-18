@@ -209,10 +209,11 @@ class Parser {
         if (currentToken.getTokenType() != TokenType.ASSIGN) {
             ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.ASSIGN) ~
                             " expected, but found " ~ to!string(currentToken.getTokenType()), currentToken);
+        } else {
+            currentToken = lexer.nextToken();
+            expr = parseExpression();
+            assign = new AssignNode(name, expr);
         }
-        currentToken = lexer.nextToken();
-        expr = parseExpression();
-        assign = new AssignNode(name, expr);
         return assign;
     }
 
@@ -340,10 +341,10 @@ class Parser {
         // First (unary) operator is optional, if not present use INVALID token type
         if (currentToken.getTokenType() == TokenType.PLUS || currentToken.getTokenType() == TokenType.MINUS) {
             operator = currentToken.getTokenType();
+            currentToken = lexer.nextToken();
         } else {
             operator = TokenType.INVALID;
         }
-        currentToken = lexer.nextToken();
         termNode = parseTerm();
         expressionNode = new ExpressionNode(operator, termNode);
         // Now repeat
@@ -360,12 +361,13 @@ class Parser {
         TermNode termNode;
         TokenType operator;
         FactorNode factorNode;
-        if (currentToken.getTokenType() == TokenType.MULT || currentToken.getTokenType() == TokenType.DIV) {
-            operator = currentToken.getTokenType();
-        } else {
-            operator = TokenType.INVALID;
-        }
-        currentToken = lexer.nextToken();
+        // if (currentToken.getTokenType() == TokenType.MULT || currentToken.getTokenType() == TokenType.DIV) {
+        //     operator = currentToken.getTokenType();
+        //     currentToken = lexer.nextToken();
+        // } else {
+        //     operator = TokenType.INVALID;
+        // }
+        operator = TokenType.INVALID;
         factorNode = parseFactor();
         termNode = new TermNode(operator, factorNode);
         while (currentToken.getTokenType() == TokenType.MULT || currentToken.getTokenType() == TokenType.DIV) {
@@ -380,7 +382,7 @@ class Parser {
     FactorNode parseFactor() {
         FactorNode factorNode;
         switch (currentToken.getTokenType()) {
-            case TokenType.VAR:
+            case TokenType.IDENT:
                 factorNode = new VariableNode(currentToken.getLiteral());
                 currentToken = lexer.nextToken();
                 break;

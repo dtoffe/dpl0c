@@ -341,12 +341,12 @@ class ComparisonNode : ConditionNode {
 
 }
 
+struct OpTermPair {
+    TokenType operator;
+    TermNode term;
+}
+
 class ExpressionNode : AstNode {
-    
-    struct OpTermPair {
-        TokenType operator;
-        TermNode term;
-    }
     
     OpTermPair[] opTerms;
 
@@ -371,12 +371,12 @@ class ExpressionNode : AstNode {
 
 }
 
-class TermNode : AstNode {
+struct OpFactorPair {
+    TokenType operator;
+    FactorNode factor;
+}
 
-    struct OpFactorPair {
-        TokenType operator;
-        FactorNode factor;
-    }
+class TermNode : AstNode {
 
     OpFactorPair[] opFactors;
 
