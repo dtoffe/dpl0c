@@ -141,8 +141,12 @@ class Lexer {
                         tokType = TokenType.MULT;
                         break;
                     case '/':
-                        literal ~= currentChar;
-                        tokType = TokenType.DIV;
+                        if (peekNext() == '/') {
+                            skipWhitespace();
+                        } else {
+                            literal ~= currentChar;
+                            tokType = TokenType.DIV;
+                        }
                         break;
                     case ControlChar.nul:
                         literal = "";
@@ -171,9 +175,13 @@ private:
                 currentChar == ControlChar.lf ||
                 currentChar == '/') {
             // Skip line comments starting with "//"
-            if (currentChar == '/' && peekNext() == '/') {
-                while (currentChar != ControlChar.nul && currentChar != ControlChar.lf) {
-                    readChar();
+            if (currentChar == '/') {
+                if (peekNext() == '/') {
+                    while (currentChar != ControlChar.nul && currentChar != ControlChar.lf) {
+                        readChar();
+                    }
+                } else {
+                    return;
                 }
             }
             readChar();
