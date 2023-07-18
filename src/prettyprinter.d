@@ -1,4 +1,4 @@
-module pprinter;
+module prettyprinter;
 
 import std.range;
 import std.stdio;

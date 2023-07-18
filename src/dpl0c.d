@@ -6,7 +6,7 @@ import ast;
 import error;
 import lexer;
 import parser;
-import pprinter;
+import prettyprinter;
 import token;
 
 enum VERSION = "0.0.1";
