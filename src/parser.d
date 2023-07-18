@@ -409,3 +409,29 @@ class Parser {
     }
 
 }
+
+/*
+    Consider the pros and cons of adopting the idioms in the following code.
+    This is widely used in the compilers literature and it is likely that
+    using this style enhances readability, extensibility and modifiability
+    of the parser code.
+
+    Token match(TokenKind kind) {
+        if (currentToken.kind == kind) {
+            Token token = currentToken;
+            currentToken = lexer.getNextToken();
+            return token;
+        } else {
+            // Error handling
+        }
+    }
+
+    void eat(TokenKind kind) {
+        if (currentToken.kind == kind) {
+            currentToken = lexer.getNextToken();
+        } else {
+            // Error handling
+        }
+    }
+
+*/
