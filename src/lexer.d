@@ -1,7 +1,6 @@
 module lexer;
 
 import std.ascii;
-import std.file;
 import std.stdio;
 import std.string;
 import error;
@@ -14,9 +13,8 @@ class Lexer {
 	int line;
 	int column;
 
-    this(string sourceFileName) {
-        string content = readText(sourceFileName);
-        sourceLines = content.splitLines(KeepTerminator.no);
+    this(string sourceContent) {
+        sourceLines = sourceContent.splitLines(KeepTerminator.no);
         currentChar = ' ';
         line = 0;
         column = 0;
