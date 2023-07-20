@@ -1,3 +1,7 @@
+/* The MIT License (MIT)
+ * Copyright (c) 2023 Alejandro Daniel Toffetti
+ * You can find the complete text of the license in the file LICENSE at the root of this project.
+ */
 module symtable;
 
 import std.container.array;
