@@ -36,12 +36,11 @@ struct SymbolEntry {
     SymbolType type;
 }
 
+// A struct can not contain a field of the same struct type, that's why a class is used
 class Scope {
 
     string name;
-    
     SymbolEntry[string] symbolTable;
-    
     Scope parent;
 
 }
@@ -68,6 +67,7 @@ static void createScope(string name) {
         currentScope = newScope;
         scopes[newScope.name] = newScope;
     }
+    writeln("Created new scope: " ~ currentScope.name);
 }
 
 static void enterScope(string name) {
@@ -87,10 +87,12 @@ static bool createSymbol(string name, SymbolKind kind, SymbolType type) {
                     name ~ "' hides another identifier declared in an enclosing scope.");
         }
         currentScope.symbolTable[name] = entry;
+        writeln("Created new symbol: " ~ name ~ " in scope: " ~ currentScope.name);
         return true;
     } else {
         ErrorManager.addScopeError(ErrorLevel.ERROR, "Warning: Identifier '" ~
                 name ~ "' already declared in the current scope.");
+        writeln("New symbol: '" ~ name ~ "' already declared in scope: " ~ currentScope.name);
         return false;
     }
 }
