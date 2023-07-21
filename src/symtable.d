@@ -6,6 +6,7 @@ module symtable;
 
 import std.container.array;
 import std.stdio;
+import error;
 
 /** 
  * I have read two distinct approaches regarding Symbol Tables:
@@ -82,12 +83,14 @@ static bool createSymbol(string name, SymbolKind kind, SymbolType type) {
     SymbolEntry entry = SymbolEntry(name, kind, type);
     if (!(name in currentScope.symbolTable)) {
         if (lookupSymbol(name)) {
-            writeln("Warning: Local Identifier '", name, "' hides another identifier declared in an enclosing scope.");
+            ErrorManager.addScopeError(ErrorLevel.WARNING, "Warning: Local Identifier '" ~
+                    name ~ "' hides another identifier declared in an enclosing scope.");
         }
         currentScope.symbolTable[name] = entry;
         return true;
     } else {
-        writeln("Error: Identifier '", name, "' already declared in the current scope.");
+        ErrorManager.addScopeError(ErrorLevel.ERROR, "Warning: Identifier '" ~
+                name ~ "' already declared in the current scope.");
         return false;
     }
 }

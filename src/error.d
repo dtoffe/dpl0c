@@ -17,7 +17,8 @@ enum ErrorType {
     COMPILER,
     LEXER,
     PARSER,
-    SEMCHECKER,
+    SCOPE,
+    TYPE,
     CODEGEN
 }
 
@@ -82,8 +83,8 @@ static class ErrorManager {
                 " lexeme: " ~ to!string(token.getLiteral()) ~ ".\n");
     }
 
-    static void addSemanticError(ErrorLevel level, string message) {
-        addError(ErrorType.SEMCHECKER, level, message);
+    static void addScopeError(ErrorLevel level, string message) {
+        addError(ErrorType.SCOPE, level, message);
     }
 
     static void addCodeGenError(ErrorLevel level, string message) {
