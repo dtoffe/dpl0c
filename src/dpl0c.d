@@ -7,6 +7,7 @@ module dpl0c;
 import std.file;
 import std.stdio;
 import ast;
+import codegen;
 import error;
 import lexer;
 import parser;
@@ -31,5 +32,10 @@ void main(string[] args) {
 
     PrettyPrinter printer = new PrettyPrinter(sourceFileName);
     node.accept(printer);
+    //ErrorManager.printErrors();
+
+    CodeGenerator codeGenerator = new CodeGenerator(sourceFileName, false);
+    node.accept(codeGenerator);
     ErrorManager.printErrors();
+
 }
