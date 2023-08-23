@@ -7,10 +7,13 @@
 		"llvm-d": "~>3.0.0"
 	},
 	"description": "A pl0 language compiler written in D",
+	"libs": ["llvm-c"],
 	"license": "MIT",
 	"mainSourceFile": "src/dpl0c.d",
 	"name": "dpl0c",
 	"sourcePaths": [
 		"src"
-	]
+	],
+    "targetName": "dpl0c",
+    "targetType": "executable"
 }
