@@ -4,8 +4,10 @@
  */
 module scopechecker;
 
+import std.stdio;
 import std.string;
 import ast;
+import error;
 import symtable;
 
 /**
@@ -29,23 +31,39 @@ class ScopeChecker : AstVisitor {
     }
 
     void visit(ProgramNode node) {
-
+        symtable.createScope("main");
+        //symtable.enterScope("main");
+        node.getBlock().accept(this);
+        symtable.exitScope();
     }
 
     void visit(BlockNode node) {
-
+        foreach (constDecl; node.getConstDecls()) {
+            constDecl.accept(this);
+        }
+        foreach (varDecl; node.getVarDecls()) {
+            varDecl.accept(this);
+        }
+        foreach (procDecl; node.getProcDecls()) {
+            procDecl.accept(this);
+        }
+        node.getStatement().accept(this);
     }
 
     void visit(ConstDeclNode node) {
-
+        symtable.createSymbol(node.getConstName(), SymbolKind.CONST, SymbolType.INTEGER, node.getConstValue());
     }
 
     void visit(VarDeclNode node) {
-
+        symtable.createSymbol(node.getVarName(), SymbolKind.VAR, SymbolType.INTEGER, 0);
     }
 
     void visit(ProcDeclNode node) {
-
+        symtable.createSymbol(node.getProcName(), SymbolKind.PROCEDURE, SymbolType.INTEGER, 0);
+        symtable.createScope(node.getProcName());
+        //symtable.enterScope(node.getProcName());
+        node.getBlock().accept(this);
+        symtable.exitScope();
     }
 
     // abstract
@@ -54,31 +72,84 @@ class ScopeChecker : AstVisitor {
     // }
 
     void visit(AssignNode node) {
-
+        Symbol foundSymbol;
+        string foundScopeName = null;
+        string symbolName = node.getIdentName();
+        if (lookupSymbol(symbolName, foundSymbol, foundScopeName)) {
+            if (foundSymbol.kind == SymbolKind.CONST) {
+                ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Constant '" ~
+                        symbolName ~ "' cannot be assigned a value.");
+            }
+            if (foundSymbol.kind == SymbolKind.PROCEDURE) {
+                ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Procedure '" ~
+                        symbolName ~ "' cannot be assigned a value.");
+            }
+            writeln("Assign to variable: " ~ symbolName ~ " in scope: " ~ foundScopeName);
+        } else {
+            ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
+                    symbolName ~ "' is undeclared in the current and all enclosing scopes.");
+        }
+        node.getExpression().accept(this);
     }
 
     void visit(CallNode node) {
-
+        Symbol foundSymbol;
+        string foundScopeName = null;
+        string symbolName = node.getIdentName();
+        if (lookupSymbol(symbolName, foundSymbol, foundScopeName)) {
+            if (foundSymbol.kind == SymbolKind.CONST) {
+                ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Constant '" ~
+                        symbolName ~ "' cannot be called.");
+            }
+            if (foundSymbol.kind == SymbolKind.VAR) {
+                ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Variable '" ~
+                        symbolName ~ "' cannot be called.");
+            }
+            writeln("Call to procedure: " ~ symbolName ~ " in scope: " ~ foundScopeName);
+        } else {
+            ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
+                    symbolName ~ "' is undeclared in the current and all enclosing scopes.");
+        }
     }
 
     void visit(ReadNode node) {
-
+        Symbol foundSymbol;
+        string foundScopeName = null;
+        string symbolName = node.getVarName();
+        if (lookupSymbol(symbolName, foundSymbol, foundScopeName)) {
+            if (foundSymbol.kind == SymbolKind.CONST) {
+                ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Constant '" ~
+                        symbolName ~ "' cannot be read into.");
+            }
+            if (foundSymbol.kind == SymbolKind.PROCEDURE) {
+                ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Procedure '" ~
+                        symbolName ~ "' cannot be read into.");
+            }
+            writeln("Read into variable: " ~ symbolName ~ " in scope: " ~ foundScopeName);
+        } else {
+            ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
+                    symbolName ~ "' is undeclared in the current and all enclosing scopes.");
+        }
     }
 
     void visit(WriteNode node) {
-
+        node.getExpression().accept(this);
     }
 
     void visit(BeginEndNode node) {
-
+        foreach ( statement; node.getStatements()) {
+            statement.accept(this);
+        }
     }
 
     void visit(IfThenNode node) {
-
+        node.getCondition().accept(this);
+        node.getStatement().accept(this);
     }
 
     void visit(WhileDoNode node) {
-
+        node.getCondition().accept(this);
+        node.getStatement().accept(this);
     }
 
     // abstract
@@ -87,19 +158,26 @@ class ScopeChecker : AstVisitor {
     // }
 
     void visit(OddCondNode node) {
-
+        node.getExpr().accept(this);
     }
 
     void visit(ComparisonNode node) {
-
+        node.getLeft().accept(this);
+        node.getRight().accept(this);
     }
 
     void visit(ExpressionNode node) {
-
+        OpTermPair[] opTerms = node.getOpTerms();
+        foreach (OpTermPair opTerm; opTerms) {
+            opTerm.term.accept(this);
+        }
     }
 
     void visit(TermNode node) {
-
+        OpFactorPair[] opFactors = node.getOpFactors();
+        foreach (OpFactorPair opFactor; opFactors) {
+            opFactor.factor.accept(this);
+        }
     }
     
     // abstract
@@ -112,11 +190,28 @@ class ScopeChecker : AstVisitor {
     }
 
     void visit(VariableNode node) {
-
+        Symbol foundSymbol;
+        string foundScopeName = null;
+        string symbolName = node.getName();
+        if (lookupSymbol(symbolName, foundSymbol, foundScopeName)) {
+            if (foundSymbol.kind == SymbolKind.PROCEDURE) {
+                ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Procedure '" ~
+                        symbolName ~ "' cannot be part of an expression and must be CALLed.");
+            }
+            if (foundSymbol.kind == SymbolKind.CONST) {
+                writeln("Referenced constant: " ~ symbolName ~ " in scope: " ~ foundScopeName);
+            }
+            if (foundSymbol.kind == SymbolKind.VAR) {
+                writeln("Referenced variable: " ~ symbolName ~ " in scope: " ~ foundScopeName);
+            }
+        } else {
+            ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
+                    symbolName ~ "' is undeclared in the current and all enclosing scopes.");
+        }
     }
 
     void visit(ParenExpNode node) {
-
+        node.getExpression().accept(this);
     }
 
 }

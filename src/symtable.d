@@ -30,19 +30,19 @@ enum SymbolType {
     INTEGER
 }
 
-struct SymbolEntry {
+struct Symbol {
+    //int id;
     string name;
     SymbolKind kind;
     SymbolType type;
+    int value;  // This is the value for consts and vars, and zero for procedures
 }
 
 // A struct can not contain a field of the same struct type, that's why a class is used
 class Scope {
-
     string name;
-    SymbolEntry[string] symbolTable;
+    Symbol[string] symbolTable;
     Scope parent;
-
 }
 
 static Scope mainScope;
@@ -51,19 +51,21 @@ static Scope currentScope;
 
 static Scope[string] scopes;
 
+//static Symbol[int] symbols;
+
 static void createScope(string name) {
     if (mainScope is null) {
         mainScope = new Scope();
         mainScope.name = name;
         mainScope.parent = null;
-        mainScope.symbolTable = new SymbolEntry[string];
+        mainScope.symbolTable = new Symbol[string];
         currentScope = mainScope;
         scopes[mainScope.name] = mainScope;
     } else {
         Scope newScope = new Scope();
         newScope.name = currentScope.name ~ "_" ~ name;
         newScope.parent = currentScope;
-        newScope.symbolTable = new SymbolEntry[string];
+        newScope.symbolTable = new Symbol[string];
         currentScope = newScope;
         scopes[newScope.name] = newScope;
     }
@@ -71,20 +73,29 @@ static void createScope(string name) {
 }
 
 static void enterScope(string name) {
-    string newScopeName = currentScope.name ~ "_" ~ name;
+    string newScopeName;
+    if (currentScope is null) {
+        newScopeName = name;
+    } else {
+        newScopeName = currentScope.name ~ "_" ~ name;
+    }
     currentScope = scopes[newScopeName];
+    writeln("Entered scope: " ~ currentScope.name);
 }
 
 static void exitScope() {
+    writeln("Exiting scope: " ~ currentScope.name);
     currentScope = currentScope.parent;
 }
 
-static bool createSymbol(string name, SymbolKind kind, SymbolType type) {
-    SymbolEntry entry = SymbolEntry(name, kind, type);
+static bool createSymbol(string name, SymbolKind kind, SymbolType type, int value) {
+    Symbol entry = Symbol(name, kind, type);
     if (!(name in currentScope.symbolTable)) {
-        if (lookupSymbol(name)) {
+        Symbol foundSymbol;
+        string foundScopeName = null;
+        if (lookupSymbol(name, foundSymbol, foundScopeName)) {
             ErrorManager.addScopeError(ErrorLevel.WARNING, "Warning: Local Identifier '" ~
-                    name ~ "' hides another identifier declared in an enclosing scope.");
+                    name ~ "' hides another identifier declared in scope: " ~ foundScopeName);
         }
         currentScope.symbolTable[name] = entry;
         writeln("Created new symbol: " ~ name ~ " in scope: " ~ currentScope.name);
@@ -97,10 +108,12 @@ static bool createSymbol(string name, SymbolKind kind, SymbolType type) {
     }
 }
 
-static bool lookupSymbol(string name) {
+static bool lookupSymbol(string name, ref Symbol foundSymbol, ref string foundScopeName) {
     Scope searchScope = currentScope;
     while (searchScope !is null) {
         if (name in searchScope.symbolTable) {
+            foundSymbol = searchScope.symbolTable[name];
+            foundScopeName = searchScope.name;
             return true;
         } else {
             searchScope = searchScope.parent;

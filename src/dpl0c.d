@@ -12,6 +12,7 @@ import error;
 import lexer;
 import parser;
 import prettyprinter;
+import scopechecker;
 import token;
 
 enum VERSION = "0.0.1";
@@ -34,8 +35,12 @@ void main(string[] args) {
     node.accept(printer);
     //ErrorManager.printErrors();
 
-    CodeGenerator codeGenerator = new CodeGenerator(sourceFileName, false);
-    node.accept(codeGenerator);
+    ScopeChecker checker = new ScopeChecker(sourceFileName);
+    node.accept(checker);
     ErrorManager.printErrors();
+
+    // CodeGenerator codeGenerator = new CodeGenerator(sourceFileName, false);
+    // node.accept(codeGenerator);
+    // ErrorManager.printErrors();
 
 }
