@@ -15,5 +15,7 @@ A PL-0 compiler written in D, featuring:
 - The code generation visitor acts as the backend, generating LLVM IR.
 
 There is no plan for adding features to the language, as commonly done in the compiler courses where PL0 is used as target language.
+
 I'm yet undecided about adding optimization passes.
-I would love, however, adding error recovery to the parser, for example via symbol insertion of missing punctuation. But I've still got to figure out how to do it.
+
+I would love, however, adding error recovery to the parser, for example via symbol insertion of missing semicolons. But I've still got to figure out how to do it.
