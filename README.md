@@ -2,7 +2,6 @@
 
 A PL-0 compiler written in D, featuring:
 
-
 - :heavy_check_mark: A hand-coded scanner.
 - :heavy_check_mark: A hand-coded recursive descent parser.
   - There is no precedence climbing: since the language is so small, the precedence is handled by the grammar.
@@ -11,8 +10,8 @@ A PL-0 compiler written in D, featuring:
 - AST traversal implemented with a Visitor pattern.
   - :heavy_check_mark: A prettyprinter visitor.
   - :heavy_check_mark: A symbol table builder and semantic checking visitor.
-  - :construction: A code generation visitor.
-- The code generation visitor acts as the backend, generating LLVM IR.
+  - :construction: A code generation visitor acting as the backend, generating LLVM IR.
+- :construction: Runtime library in C for the implementation of "read" and "write".
 
 There is no plan for adding features to the language, as commonly done in the compiler courses where PL0 is used as target language.
 
