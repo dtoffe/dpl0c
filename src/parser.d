@@ -23,7 +23,6 @@ class Parser {
 
     ProgramNode parseProgram() {
         ProgramNode program = new ProgramNode();
-        symtable.createScope("main");
         BlockNode block = parseBlock();
         program.block = block;
         if (currentToken.getTokenType() == TokenType.PERIOD) {
@@ -38,7 +37,6 @@ class Parser {
                 " expected, but found " ~ to!string(currentToken.getTokenType()) ~ " in parseProgram",
                 currentToken);
         }
-        symtable.exitScope();
         return program;
     }
 
@@ -87,7 +85,6 @@ class Parser {
             if (!error) {
                 ConstDeclNode decl = new ConstDeclNode(name, value);
                 constDecls ~= decl;
-                symtable.createSymbol(name, SymbolKind.CONST, SymbolType.INTEGER);
             }
             error = false;
             currentToken = lexer.nextToken();
@@ -112,7 +109,6 @@ class Parser {
             name = currentToken.getLiteral();
             VarDeclNode decl = new VarDeclNode(name);
             varDecls ~= decl;
-            symtable.createSymbol(name, SymbolKind.VAR, SymbolType.INTEGER);
             currentToken = lexer.nextToken();
             if (currentToken.getTokenType() == TokenType.SEMICOLON) {
                 currentToken = lexer.nextToken();
@@ -156,8 +152,6 @@ class Parser {
                 " expected, but found " ~ to!string(currentToken.getTokenType()) ~ " in parseProcDecl",
                 currentToken); 
         }
-        symtable.createSymbol(procName, SymbolKind.PROCEDURE, SymbolType.INTEGER);
-        symtable.createScope(procName);
         BlockNode block = parseBlock();
         procDecl = new ProcDeclNode(procName, block);
         if (currentToken.getTokenType() == TokenType.SEMICOLON) {
@@ -167,7 +161,6 @@ class Parser {
                 " expected, but found " ~ to!string(currentToken.getTokenType()) ~ " in parseProcDecl",
                 currentToken); 
         }
-        symtable.exitScope();
         return procDecl;
     }
 
