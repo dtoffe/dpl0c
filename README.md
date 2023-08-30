@@ -1,6 +1,34 @@
 # dpl0c
 
-A PL-0 compiler written in D, featuring:
+A PL-0 compiler written in D. This is the grammar of the PL/0 language:
+
+``` BNF
+program = block "." ;
+
+block = [ "const" ident "=" number { "," ident "=" number } ";" ]
+        [ "var" ident { "," ident } ";" ]
+        { "procedure" ident ";" block ";" }
+        statement ;
+
+statement = [ ident ":=" expression
+            | "call" ident 
+            | "read" ident                                      //   | "?" ident 
+            | "write" expression                                //   | "!" expression 
+            | "begin" statement { ";" statement } "end" 
+            | "if" condition "then" statement 
+            | "while" condition "do" statement ] ;
+
+condition = "odd" expression |
+            expression ( "=" | "#" | "<" | "<=" | ">" | ">=" ) expression ;
+
+expression = [ "+" | "-" ] term { ( "+" | "-" ) term } ;
+
+term = factor { ( "*" | "/" ) factor } ;
+
+factor = ident | number | "(" expression ")" ;
+```
+
+The compiler is written in D and features:
 
 - :heavy_check_mark: A hand-coded scanner.
 - :heavy_check_mark: A hand-coded recursive descent parser.
