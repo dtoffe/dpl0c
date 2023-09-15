@@ -1,6 +1,6 @@
 # dpl0c
 
-A PL-0 compiler written in D. This is the grammar of the PL/0 language:
+A PL/0 compiler written in D. This is the grammar of the PL/0 language:
 
 ``` BNF
 program = block "." ;

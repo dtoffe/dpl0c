@@ -39,8 +39,8 @@ void main(string[] args) {
     node.accept(checker);
     ErrorManager.printErrors();
 
-    // CodeGenerator codeGenerator = new CodeGenerator(sourceFileName, false);
-    // node.accept(codeGenerator);
+    CodeGenerator codeGenerator = new CodeGenerator(sourceFileName, false);
+    node.accept(codeGenerator);
     // ErrorManager.printErrors();
 
 }
