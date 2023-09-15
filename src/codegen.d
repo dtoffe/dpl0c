@@ -122,7 +122,7 @@ class CodeGenerator : AstVisitor {
             valRef = LLVMBuildAlloca(llvmBuilder, int32Type, symbolName.toStringz());
             constValue = LLVMConstInt(int32Type, node.getConstValue(), false);
             LLVMBuildStore(llvmBuilder, constValue, valRef);
-            foundSymbol.llvmValue = valRef;
+            node.setLLVMValue(valRef);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
                     not found in scope: '" ~ foundScopeName ~ "'.");
@@ -137,7 +137,7 @@ class CodeGenerator : AstVisitor {
         LLVMValueRef constValue;
         if (lookupSymbol(symbolName, foundSymbol, foundScopeName)) {
             valRef = LLVMBuildAlloca(llvmBuilder, int32Type, symbolName.toStringz());
-            foundSymbol.llvmValue = valRef;
+            node.setLLVMValue(valRef);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
                     not found in scope: '" ~ foundScopeName ~ "'.");
@@ -176,15 +176,15 @@ class CodeGenerator : AstVisitor {
     //void visit(FactorNode node); // abstract
 
     void visit(NumberNode node) {
-        //LLVMBuildConst(llvmBuilder, int32Type, node.getNumber(), null);
+        node.setLLVMValue(LLVMConstInt(LLVMInt32Type(), node.getNumberValue, true));
     }
 
     void visit(VariableNode node) {
-
+        //node.setLLVMValue(LLVMGetNamedValue(llvmModule, cast(char*)node.getName.toStringz()));
     }
 
     void visit(ParenExpNode node) {
-
+        node.getExpression().accept(this);
     }
 
 }

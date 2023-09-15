@@ -37,7 +37,6 @@ struct Symbol {
     SymbolKind kind;
     SymbolType type;
     int value;  // This is the value for consts and vars, and zero for procedures
-    LLVMValueRef llvmValue;
 }
 
 // A struct can not contain a field of the same struct type, that's why a class is used

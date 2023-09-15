@@ -4,7 +4,9 @@
  */
 module ast;
 
+import llvm;
 import std.conv;
+import symtable;
 import token;
 
 abstract class AstNode {
@@ -83,6 +85,8 @@ class ConstDeclNode : AstNode {
 
     string constName;
     int constValue;
+    Symbol constSymbol;
+    LLVMValueRef llvmValue;
     
     this(string constName, int constValue) {
         this.constName = constName;
@@ -97,6 +101,22 @@ class ConstDeclNode : AstNode {
         return constValue;
     }
 
+    Symbol getConstSymbol() {
+        return constSymbol;
+    }
+
+    void setConstSymbol(Symbol constSymbol) {
+        this.constSymbol = constSymbol;
+    }
+
+    LLVMValueRef getLLVMValue() {
+        return llvmValue;
+    }
+
+    void setLLVMValue(LLVMValueRef llvmValue) {
+        this.llvmValue = llvmValue;
+    }
+
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
     }
@@ -106,6 +126,8 @@ class ConstDeclNode : AstNode {
 class VarDeclNode : AstNode {
 
     string varName;
+    Symbol varSymbol;
+    LLVMValueRef llvmValue;
 
     this(string varName) {
         this.varName = varName;
@@ -115,6 +137,22 @@ class VarDeclNode : AstNode {
         return varName;
     }
     
+    Symbol getVarSymbol() {
+        return varSymbol;
+    }
+
+    void setVarSymbol(Symbol varSymbol) {
+        this.varSymbol = varSymbol;
+    }
+
+    LLVMValueRef getLLVMValue() {
+        return llvmValue;
+    }
+
+    void setLLVMValue(LLVMValueRef llvmValue) {
+        this.llvmValue = llvmValue;
+    }
+
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
     }
@@ -124,6 +162,7 @@ class VarDeclNode : AstNode {
 class ProcDeclNode : AstNode {
 
     string procName;
+    Symbol procSymbol;
     BlockNode block;
 
     this(string procName, BlockNode block) {
@@ -133,6 +172,14 @@ class ProcDeclNode : AstNode {
 
     string getProcName() {
         return procName;
+    }
+
+    Symbol getProcSymbol() {
+        return procSymbol;
+    }
+
+    void setProcSymbol(Symbol procSymbol) {
+        this.procSymbol = procSymbol;
     }
 
     BlockNode getBlock() {
@@ -152,6 +199,7 @@ abstract class StatementNode : AstNode {
 class AssignNode : StatementNode {
 
     string identName;
+    Symbol identSymbol;
     ExpressionNode expression;
 
     this(string identName, ExpressionNode expression) {
@@ -161,6 +209,14 @@ class AssignNode : StatementNode {
 
     string getIdentName() {
         return identName;
+    }
+
+    Symbol getIdentSymbol() {
+        return identSymbol;
+    }
+
+    void setIdentSymbol(Symbol identSymbol) {
+        this.identSymbol = identSymbol;
     }
 
     ExpressionNode getExpression() {
@@ -176,6 +232,7 @@ class AssignNode : StatementNode {
 class CallNode : StatementNode {
 
     string identName;
+    Symbol identSymbol;
 
     this(string identName) {
         this.identName = identName;
@@ -185,6 +242,14 @@ class CallNode : StatementNode {
         return identName;
     }
     
+    Symbol getIdentSymbol() {
+        return identSymbol;
+    }
+
+    void setIdentSymbol(Symbol identSymbol) {
+        this.identSymbol = identSymbol;
+    }
+
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
     }
@@ -194,6 +259,7 @@ class CallNode : StatementNode {
 class ReadNode : StatementNode {
 
     string varName;
+    Symbol varSymbol;
 
     this(string varName) {
         this.varName = varName;
@@ -201,6 +267,14 @@ class ReadNode : StatementNode {
 
     string getVarName() {
         return varName;
+    }
+
+    Symbol getVarSymbol() {
+        return varSymbol;
+    }
+
+    void setVarSymbol(Symbol varSymbol) {
+        this.varSymbol = varSymbol;
     }
 
     override void accept(AstVisitor visitor) {
@@ -412,6 +486,7 @@ abstract class FactorNode : AstNode {
 class NumberNode : FactorNode {
 
     string value;
+    LLVMValueRef llvmValue;
 
     this(string value) {
         this.value = value;
@@ -425,6 +500,14 @@ class NumberNode : FactorNode {
         return to!int(value);
     }
 
+    LLVMValueRef getLLVMValue() {
+        return llvmValue;
+    }
+
+    void setLLVMValue(LLVMValueRef llvmValue) {
+        this.llvmValue = llvmValue;
+    }
+
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
     }
@@ -433,14 +516,32 @@ class NumberNode : FactorNode {
 
 class VariableNode : FactorNode {
     
-    string name;
+    string varName;
+    Symbol varSymbol;
+    LLVMValueRef llvmValue;
 
-    this(string name) {
-        this.name = name;
+    this(string varName) {
+        this.varName = varName;
     }
 
-    string getName() {
-        return name;
+    string getVarName() {
+        return varName;
+    }
+
+    Symbol getVarSymbol() {
+        return varSymbol;
+    }
+
+    void setVarSymbol(Symbol varSymbol) {
+        this.varSymbol = varSymbol;
+    }
+
+    LLVMValueRef getLLVMValue() {
+        return llvmValue;
+    }
+
+    void setLLVMValue(LLVMValueRef llvmValue) {
+        this.llvmValue = llvmValue;
     }
 
     override void accept(AstVisitor visitor) {
