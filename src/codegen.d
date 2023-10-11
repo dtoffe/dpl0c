@@ -11,6 +11,7 @@ import std.string;
 import ast;
 import error;
 import symtable;
+import token;
 
 class CodeGenerator : AstVisitor {
 
@@ -122,7 +123,6 @@ class CodeGenerator : AstVisitor {
             valRef = LLVMBuildAlloca(llvmBuilder, int32Type, symbolName.toStringz());
             constValue = LLVMConstInt(int32Type, node.getConstValue(), false);
             LLVMBuildStore(llvmBuilder, constValue, valRef);
-            node.setLLVMValue(valRef);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
                     not found in scope: '" ~ foundScopeName ~ "'.");
@@ -134,10 +134,12 @@ class CodeGenerator : AstVisitor {
         string foundScopeName = null;
         string symbolName = node.getVarName();
         LLVMValueRef valRef;
-        LLVMValueRef constValue;
+        LLVMValueRef varValue;
         if (lookupSymbol(symbolName, foundSymbol, foundScopeName)) {
             valRef = LLVMBuildAlloca(llvmBuilder, int32Type, symbolName.toStringz());
-            node.setLLVMValue(valRef);
+            // All vars are initialized to 0 on declaration
+            varValue = LLVMConstInt(int32Type, 0, false);
+            LLVMBuildStore(llvmBuilder, varValue, valRef);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
                     not found in scope: '" ~ foundScopeName ~ "'.");
@@ -158,7 +160,21 @@ class CodeGenerator : AstVisitor {
 
     //void visit(StatementNode node); // abstract
     void visit(AssignNode node) {
-
+        Symbol foundSymbol;
+        string foundScopeName = null;
+        string symbolName = node.getIdentName();
+        LLVMValueRef variableRef;
+        LLVMValueRef expressionValue;
+        if (lookupSymbol(symbolName, foundSymbol, foundScopeName)) {
+            node.getExpression().accept(this);
+            variableRef = LLVMBuildLoad(llvmBuilder, variableRef, symbolName.toStringz());
+            //LLVMValueRef LLVMBuildLoad(LLVMBuilderRef, LLVMValueRef PointerVal, const(char)* Name);
+            expressionValue = node.getExpression.getLlvmValue();
+            LLVMBuildStore(llvmBuilder, variableRef, expressionValue);
+        } else {
+            ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
+                    not found in scope: '" ~ foundScopeName ~ "'.");
+        }
     }
 
     void visit(CallNode node) {}
@@ -170,17 +186,84 @@ class CodeGenerator : AstVisitor {
     //void visit(ConditionNode node); // abstract
     void visit(OddCondNode node) {}
     void visit(ComparisonNode node) {}
-    void visit(ExpressionNode node) {}
-    void visit(TermNode node) {}
+
+    void visit(ExpressionNode node) {
+        LLVMValueRef llvmValue;
+        OpTermPair[] opTerms = node.getOpTerms();
+        foreach (index, opTerm; opTerms) {
+            if (index == 0) {
+                opTerm.term.accept(this);
+                if (opTerm.operator == TokenType.MINUS) {
+                    LLVMValueRef zero = LLVMConstInt(LLVMInt32Type(), 0, false);
+                    llvmValue = LLVMBuildSub(llvmBuilder, zero, llvmValue, "tmp");
+                } else {
+                    llvmValue = opTerm.term.getLlvmValue();
+                }
+                node.setLlvmValue(llvmValue);
+            } else {
+                opTerm.term.accept(this);
+                llvmValue = opTerm.term.getLlvmValue();
+                switch (opTerm.operator) {
+                    case TokenType.PLUS:
+                        llvmValue = LLVMBuildAdd(llvmBuilder, node.getLlvmValue(), llvmValue, "tmp");
+                        break;
+                    case TokenType.MINUS:
+                        llvmValue = LLVMBuildSub(llvmBuilder, node.getLlvmValue(), llvmValue, "tmp");
+                        break;
+                    default:
+                        break;
+                }
+                node.setLlvmValue(llvmValue);
+            }
+        }
+    }
+
+    void visit(TermNode node) {
+        LLVMValueRef llvmValue;
+        OpFactorPair[] opFactors = node.getOpFactors();
+        foreach (index, opFactor; opFactors) {
+            if (index == 0) {
+                opFactor.factor.accept(this);
+                llvmValue = opFactor.factor.getLlvmValue();
+                node.setLlvmValue(llvmValue);
+            } else {
+                opFactor.factor.accept(this);
+                llvmValue = opFactor.factor.getLlvmValue();
+                switch (opFactor.operator) {
+                    case TokenType.MULT:
+                        llvmValue = LLVMBuildMul(llvmBuilder, node.getLlvmValue(), llvmValue, "tmp");
+                        break;
+                    case TokenType.DIV:
+                        llvmValue = LLVMBuildUDiv(llvmBuilder, node.getLlvmValue(), llvmValue, "tmp");
+                        break;
+                    default:
+                        break;
+                }
+                node.setLlvmValue(llvmValue);
+            }
+        }
+    }
 
     //void visit(FactorNode node); // abstract
 
     void visit(NumberNode node) {
-        node.setLLVMValue(LLVMConstInt(LLVMInt32Type(), node.getNumberValue, true));
+        LLVMValueRef numberRef;
+        numberRef = LLVMConstInt(LLVMInt32Type(), node.getNumberValue, true);
+        node.setLlvmValue(numberRef);
     }
 
     void visit(VariableNode node) {
-        //node.setLLVMValue(LLVMGetNamedValue(llvmModule, cast(char*)node.getName.toStringz()));
+        Symbol foundSymbol;
+        string foundScopeName = null;
+        string symbolName = node.getVarName();
+        LLVMValueRef variableRef;
+        if (lookupSymbol(symbolName, foundSymbol, foundScopeName)) {
+            variableRef = LLVMBuildLoad(llvmBuilder, variableRef, symbolName.toStringz());
+        } else {
+            ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
+                    not found in scope: '" ~ foundScopeName ~ "'.");
+        }
+        node.setLlvmValue(variableRef);
     }
 
     void visit(ParenExpNode node) {
