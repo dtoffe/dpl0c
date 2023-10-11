@@ -86,8 +86,7 @@ class ConstDeclNode : AstNode {
     string constName;
     int constValue;
     Symbol constSymbol;
-    LLVMValueRef llvmValue;
-    
+
     this(string constName, int constValue) {
         this.constName = constName;
         this.constValue = constValue;
@@ -109,14 +108,6 @@ class ConstDeclNode : AstNode {
         this.constSymbol = constSymbol;
     }
 
-    LLVMValueRef getLLVMValue() {
-        return llvmValue;
-    }
-
-    void setLLVMValue(LLVMValueRef llvmValue) {
-        this.llvmValue = llvmValue;
-    }
-
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
     }
@@ -127,8 +118,7 @@ class VarDeclNode : AstNode {
 
     string varName;
     Symbol varSymbol;
-    LLVMValueRef llvmValue;
-
+ 
     this(string varName) {
         this.varName = varName;
     }
@@ -143,14 +133,6 @@ class VarDeclNode : AstNode {
 
     void setVarSymbol(Symbol varSymbol) {
         this.varSymbol = varSymbol;
-    }
-
-    LLVMValueRef getLLVMValue() {
-        return llvmValue;
-    }
-
-    void setLLVMValue(LLVMValueRef llvmValue) {
-        this.llvmValue = llvmValue;
     }
 
     override void accept(AstVisitor visitor) {
@@ -367,7 +349,21 @@ class WhileDoNode : StatementNode {
 
 }
 
-abstract class ConditionNode : AstNode {
+abstract class ValuedNode : AstNode {
+    
+    LLVMValueRef llvmValue;
+
+    LLVMValueRef getLlvmValue() {
+        return llvmValue;
+    }
+
+    void setLlvmValue(LLVMValueRef llvmValue) {
+        this.llvmValue = llvmValue;
+    }
+
+}
+
+abstract class ConditionNode : ValuedNode {
     
 }
 
@@ -424,7 +420,7 @@ struct OpTermPair {
     TermNode term;
 }
 
-class ExpressionNode : AstNode {
+class ExpressionNode : ValuedNode {
     
     OpTermPair[] opTerms;
 
@@ -454,10 +450,10 @@ struct OpFactorPair {
     FactorNode factor;
 }
 
-class TermNode : AstNode {
+class TermNode : ValuedNode {
 
     OpFactorPair[] opFactors;
-
+ 
     this(TokenType operator, FactorNode factor) {
         this.opFactors = new OpFactorPair[0];
         OpFactorPair opFactor = OpFactorPair(operator, factor);
@@ -479,15 +475,14 @@ class TermNode : AstNode {
 
 }
 
-abstract class FactorNode : AstNode {
+abstract class FactorNode : ValuedNode {
 
 }
 
 class NumberNode : FactorNode {
 
     string value;
-    LLVMValueRef llvmValue;
-
+ 
     this(string value) {
         this.value = value;
     }
@@ -500,14 +495,6 @@ class NumberNode : FactorNode {
         return to!int(value);
     }
 
-    LLVMValueRef getLLVMValue() {
-        return llvmValue;
-    }
-
-    void setLLVMValue(LLVMValueRef llvmValue) {
-        this.llvmValue = llvmValue;
-    }
-
     override void accept(AstVisitor visitor) {
         visitor.visit(this);
     }
@@ -518,7 +505,6 @@ class VariableNode : FactorNode {
     
     string varName;
     Symbol varSymbol;
-    LLVMValueRef llvmValue;
 
     this(string varName) {
         this.varName = varName;
@@ -534,14 +520,6 @@ class VariableNode : FactorNode {
 
     void setVarSymbol(Symbol varSymbol) {
         this.varSymbol = varSymbol;
-    }
-
-    LLVMValueRef getLLVMValue() {
-        return llvmValue;
-    }
-
-    void setLLVMValue(LLVMValueRef llvmValue) {
-        this.llvmValue = llvmValue;
     }
 
     override void accept(AstVisitor visitor) {
