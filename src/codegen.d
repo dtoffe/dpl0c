@@ -159,6 +159,7 @@ class CodeGenerator : AstVisitor {
     }
 
     //void visit(StatementNode node); // abstract
+    
     void visit(AssignNode node) {
         Symbol foundSymbol;
         string foundScopeName = null;
@@ -183,9 +184,49 @@ class CodeGenerator : AstVisitor {
     void visit(BeginEndNode node) {}
     void visit(IfThenNode node) {}
     void visit(WhileDoNode node) {}
+    
     //void visit(ConditionNode node); // abstract
-    void visit(OddCondNode node) {}
-    void visit(ComparisonNode node) {}
+
+    void visit(OddCondNode node) {
+        LLVMValueRef llvmValue;
+        node.getExpr().accept(this);
+        llvmValue = node.getExpr().getLlvmValue();
+        llvmValue = LLVMBuildAnd(llvmBuilder, llvmValue, LLVMConstInt(LLVMInt32Type(), 1, false), "lsb");
+        node.setLlvmValue(llvmValue);
+    }
+
+    void visit(ComparisonNode node) {
+        LLVMValueRef llvmValue;
+        LLVMValueRef llvmLeftValue;
+        LLVMValueRef llvmRightValue;
+        node.getLeft().accept(this);
+        llvmLeftValue = node.getLeft().getLlvmValue();
+        node.getRight().accept(this);
+        llvmRightValue = node.getRight().getLlvmValue();
+        switch (node.getRelOperator()) {
+            case TokenType.EQUAL:
+                llvmValue = LLVMBuildICmp(llvmBuilder, LLVMIntEQ, llvmLeftValue, llvmRightValue, "tmp");
+                break;
+            case TokenType.NOTEQUAL:
+                llvmValue = LLVMBuildICmp(llvmBuilder, LLVMIntNE, llvmLeftValue, llvmRightValue, "tmp");
+                break;
+            case TokenType.LESSER:
+                llvmValue = LLVMBuildICmp(llvmBuilder, LLVMIntSLT, llvmLeftValue, llvmRightValue, "tmp");
+                break;
+            case TokenType.LESSEREQ:
+                llvmValue = LLVMBuildICmp(llvmBuilder, LLVMIntSLE, llvmLeftValue, llvmRightValue, "tmp");
+                break;
+            case TokenType.GREATER:
+                llvmValue = LLVMBuildICmp(llvmBuilder, LLVMIntSGT, llvmLeftValue, llvmRightValue, "tmp");
+                break;
+            case TokenType.GREATEREQ:
+                llvmValue = LLVMBuildICmp(llvmBuilder, LLVMIntSGE, llvmLeftValue, llvmRightValue, "tmp");
+                break;
+            default:
+                break;
+        }
+        node.setLlvmValue(llvmValue);
+    }
 
     void visit(ExpressionNode node) {
         LLVMValueRef llvmValue;
