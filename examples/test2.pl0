@@ -1,0 +1,9 @@
+const max = 100, min = 10, avg = 55;
+
+var arg, ret, nop;
+
+begin
+  arg := 0;
+  ret := arg
+end
+.

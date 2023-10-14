@@ -17,14 +17,16 @@ class CodeGenerator : AstVisitor {
 
     string name;
     bool emitDebugInfo;
-    // int annMDKind;
 
+    LLVMTypeRef int32Type;
     LLVMContextRef llvmContext;
     LLVMModuleRef llvmModule;
     LLVMBuilderRef llvmBuilder;
-    LLVMTypeRef int32Type;
+    LLVMValueRef mainFunction;
+    LLVMBasicBlockRef mainEntryBlock;
     LLVMTargetMachineRef llvmTargetMachine;
 
+    LLVMValueRef[string] vars;
 
     this(string name, bool emitDebugInfo = false) {
         this.name = name;
@@ -35,11 +37,10 @@ class CodeGenerator : AstVisitor {
         LLVMInitializeNativeTarget();
 
         // Setup LLVM main objects
+        int32Type = LLVMInt32Type();
         llvmContext = LLVMContextCreate();
         llvmModule = LLVMModuleCreateWithNameInContext((name ~ ".ll").toStringz(), llvmContext);
         llvmBuilder = LLVMCreateBuilderInContext(llvmContext);
-        int32Type = LLVMInt32Type();
-        // annMDKind = LLVMGetMDKindID(("llvm.annotation").toStringz(), "llvm.annotation".length);
 
         // Setup default triple
         char *errorMessage;
@@ -78,8 +79,8 @@ class CodeGenerator : AstVisitor {
 
         LLVMTypeRef[] mainArgs = [LLVMInt32Type()];
         LLVMTypeRef mainFuncType = LLVMFunctionType(LLVMInt32Type(), mainArgs.ptr, cast(uint) mainArgs.length, false);
-        LLVMValueRef mainFunction = LLVMAddFunction(llvmModule, "main", mainFuncType);
-        LLVMBasicBlockRef mainEntryBlock = LLVMAppendBasicBlock(mainFunction, "main");
+        mainFunction = LLVMAddFunction(llvmModule, "main", mainFuncType);
+        mainEntryBlock = LLVMAppendBasicBlock(mainFunction, "main");
         LLVMPositionBuilderAtEnd(llvmBuilder, mainEntryBlock);
 
         enterScope("main");
@@ -123,6 +124,7 @@ class CodeGenerator : AstVisitor {
             valRef = LLVMBuildAlloca(llvmBuilder, int32Type, symbolName.toStringz());
             constValue = LLVMConstInt(int32Type, node.getConstValue(), false);
             LLVMBuildStore(llvmBuilder, constValue, valRef);
+            vars[symbolName ~ foundScopeName] = valRef;
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
                     not found in scope: '" ~ foundScopeName ~ "'.");
@@ -140,6 +142,7 @@ class CodeGenerator : AstVisitor {
             // All vars are initialized to 0 on declaration
             varValue = LLVMConstInt(int32Type, 0, false);
             LLVMBuildStore(llvmBuilder, varValue, valRef);
+            vars[symbolName ~ foundScopeName] = valRef;
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
                     not found in scope: '" ~ foundScopeName ~ "'.");
@@ -168,8 +171,7 @@ class CodeGenerator : AstVisitor {
         LLVMValueRef expressionValue;
         if (lookupSymbol(symbolName, foundSymbol, foundScopeName)) {
             node.getExpression().accept(this);
-            variableRef = LLVMBuildLoad(llvmBuilder, variableRef, symbolName.toStringz());
-            //LLVMValueRef LLVMBuildLoad(LLVMBuilderRef, LLVMValueRef PointerVal, const(char)* Name);
+            variableRef = vars[symbolName ~ foundScopeName];
             expressionValue = node.getExpression.getLlvmValue();
             LLVMBuildStore(llvmBuilder, variableRef, expressionValue);
         } else {
@@ -181,9 +183,33 @@ class CodeGenerator : AstVisitor {
     void visit(CallNode node) {}
     void visit(ReadNode node) {}
     void visit(WriteNode node) {}
-    void visit(BeginEndNode node) {}
+
+    void visit(BeginEndNode node) {
+        foreach (index, statement; node.getStatements()) {
+            statement.accept(this);
+        }
+    }
+
     void visit(IfThenNode node) {}
-    void visit(WhileDoNode node) {}
+
+    void visit(WhileDoNode node) {
+        LLVMValueRef llvmConditionValue;
+        node.getCondition().accept(this);
+        llvmConditionValue = node.getCondition().getLlvmValue();
+
+        LLVMBasicBlockRef loopConditionBlock = LLVMAppendBasicBlock(mainFunction, "loop_condition");
+        LLVMBasicBlockRef loopBodyBlock = LLVMAppendBasicBlock(mainFunction, "loop_body");
+        LLVMBasicBlockRef loopExitBlock = LLVMAppendBasicBlock(mainFunction, "loop_exit");
+        LLVMBuildBr(llvmBuilder, loopConditionBlock);
+        LLVMPositionBuilderAtEnd(llvmBuilder, loopConditionBlock);
+        LLVMBuildCondBr(llvmBuilder, llvmConditionValue, loopBodyBlock, loopExitBlock);
+        LLVMPositionBuilderAtEnd(llvmBuilder, loopBodyBlock);
+
+        node.getStatement().accept(this);
+
+        LLVMBuildBr(llvmBuilder, loopConditionBlock);
+        LLVMPositionBuilderAtEnd(llvmBuilder, loopExitBlock);
+    }
     
     //void visit(ConditionNode node); // abstract
 
@@ -289,7 +315,7 @@ class CodeGenerator : AstVisitor {
 
     void visit(NumberNode node) {
         LLVMValueRef numberRef;
-        numberRef = LLVMConstInt(LLVMInt32Type(), node.getNumberValue, true);
+        numberRef = LLVMConstInt(int32Type, node.getNumberValue, true);
         node.setLlvmValue(numberRef);
     }
 
@@ -299,7 +325,7 @@ class CodeGenerator : AstVisitor {
         string symbolName = node.getVarName();
         LLVMValueRef variableRef;
         if (lookupSymbol(symbolName, foundSymbol, foundScopeName)) {
-            variableRef = LLVMBuildLoad(llvmBuilder, variableRef, symbolName.toStringz());
+            variableRef = LLVMBuildLoad(llvmBuilder, vars[symbolName ~ foundScopeName], symbolName.toStringz());
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
                     not found in scope: '" ~ foundScopeName ~ "'.");
