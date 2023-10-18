@@ -4,6 +4,7 @@ var arg, ret, nop;
 
 begin
   arg := 0;
-  ret := arg
+  while arg < 10 do
+    arg := arg + 1
 end
 .

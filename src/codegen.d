@@ -23,7 +23,9 @@ class CodeGenerator : AstVisitor {
     LLVMModuleRef llvmModule;
     LLVMBuilderRef llvmBuilder;
     LLVMValueRef mainFunction;
+    LLVMValueRef currentFunction;
     LLVMBasicBlockRef mainEntryBlock;
+    LLVMBasicBlockRef currentBasicBlock;
     LLVMTargetMachineRef llvmTargetMachine;
 
     LLVMValueRef[string] vars;
@@ -81,13 +83,14 @@ class CodeGenerator : AstVisitor {
         LLVMTypeRef mainFuncType = LLVMFunctionType(LLVMInt32Type(), mainArgs.ptr, cast(uint) mainArgs.length, false);
         mainFunction = LLVMAddFunction(llvmModule, "main", mainFuncType);
         mainEntryBlock = LLVMAppendBasicBlock(mainFunction, "main");
+        currentBasicBlock = mainEntryBlock;
         LLVMPositionBuilderAtEnd(llvmBuilder, mainEntryBlock);
 
         enterScope("main");
         node.getBlock().accept(this);
         exitScope();
 
-        LLVMPositionBuilderAtEnd(llvmBuilder, mainEntryBlock);
+        //LLVMPositionBuilderAtEnd(llvmBuilder, mainEntryBlock);
         LLVMBuildRet(llvmBuilder, LLVMConstInt(LLVMInt32Type(), 0, true));
 
         char *generatedCode = LLVMPrintModuleToString(llvmModule);
@@ -150,15 +153,22 @@ class CodeGenerator : AstVisitor {
     }
 
     void visit(ProcDeclNode node) {
+        LLVMBasicBlockRef parentBasicBlock = currentBasicBlock;
         LLVMTypeRef[] procArgs = [];
         LLVMTypeRef procType = LLVMFunctionType(LLVMInt32Type(), procArgs.ptr, cast(uint) procArgs.length, false);
         LLVMValueRef thisProcedure = LLVMAddFunction(llvmModule, cast(char*)node.getProcName.toStringz(), procType);
+        LLVMValueRef parentFunction = currentFunction;
         string procName = node.getProcName ~ "_main";
         LLVMBasicBlockRef procBasicBlock = LLVMAppendBasicBlock(thisProcedure, cast(char*)procName.toStringz());
+        currentBasicBlock = procBasicBlock;
+        currentFunction = thisProcedure;
         LLVMPositionBuilderAtEnd(llvmBuilder, procBasicBlock);
         enterScope(node.getProcName());
         node.getBlock().accept(this);
         exitScope();
+        currentBasicBlock = parentBasicBlock;
+        currentFunction = parentFunction;
+        LLVMPositionBuilderAtEnd(llvmBuilder, currentBasicBlock);
     }
 
     //void visit(StatementNode node); // abstract
@@ -180,7 +190,13 @@ class CodeGenerator : AstVisitor {
         }
     }
 
-    void visit(CallNode node) {}
+    void visit(CallNode node) {
+        LLVMValueRef[] args = null;
+        LLVMValueRef calledFunction = LLVMGetNamedFunction(llvmModule, node.getIdentName().toStringz());
+        LLVMValueRef callInstruction = LLVMBuildCall(llvmBuilder, calledFunction, args.ptr,
+                                        cast(uint)args.length, node.getIdentName().toStringz());
+    }
+
     void visit(ReadNode node) {}
     void visit(WriteNode node) {}
 
@@ -190,24 +206,46 @@ class CodeGenerator : AstVisitor {
         }
     }
 
-    void visit(IfThenNode node) {}
+    void visit(IfThenNode node) {
+        LLVMBasicBlockRef ifConditionBlock = LLVMAppendBasicBlock(currentFunction, "if_condition");
+        LLVMBasicBlockRef ifTrueBlock = LLVMAppendBasicBlock(currentFunction, "if_true");
+        LLVMBasicBlockRef ifExitBlock = LLVMAppendBasicBlock(currentFunction, "if_exit");
 
-    void visit(WhileDoNode node) {
+        LLVMBuildBr(llvmBuilder, ifConditionBlock);
+        LLVMPositionBuilderAtEnd(llvmBuilder, ifConditionBlock);
+
         LLVMValueRef llvmConditionValue;
         node.getCondition().accept(this);
         llvmConditionValue = node.getCondition().getLlvmValue();
 
-        LLVMBasicBlockRef loopConditionBlock = LLVMAppendBasicBlock(mainFunction, "loop_condition");
-        LLVMBasicBlockRef loopBodyBlock = LLVMAppendBasicBlock(mainFunction, "loop_body");
-        LLVMBasicBlockRef loopExitBlock = LLVMAppendBasicBlock(mainFunction, "loop_exit");
+        LLVMBuildCondBr(llvmBuilder, llvmConditionValue, ifTrueBlock, ifExitBlock);
+        LLVMPositionBuilderAtEnd(llvmBuilder, ifTrueBlock);
+
+        node.getStatement().accept(this);
+
+        LLVMMoveBasicBlockAfter(ifExitBlock, LLVMGetInsertBlock(llvmBuilder));
+        LLVMPositionBuilderAtEnd(llvmBuilder, ifExitBlock);
+    }
+
+    void visit(WhileDoNode node) {
+        LLVMBasicBlockRef loopConditionBlock = LLVMAppendBasicBlock(currentFunction, "loop_condition");
+        LLVMBasicBlockRef loopBodyBlock = LLVMAppendBasicBlock(currentFunction, "loop_body");
+        LLVMBasicBlockRef loopExitBlock = LLVMAppendBasicBlock(currentFunction, "loop_exit");
+
         LLVMBuildBr(llvmBuilder, loopConditionBlock);
         LLVMPositionBuilderAtEnd(llvmBuilder, loopConditionBlock);
+
+        LLVMValueRef llvmConditionValue;
+        node.getCondition().accept(this);
+        llvmConditionValue = node.getCondition().getLlvmValue();
+
         LLVMBuildCondBr(llvmBuilder, llvmConditionValue, loopBodyBlock, loopExitBlock);
         LLVMPositionBuilderAtEnd(llvmBuilder, loopBodyBlock);
 
         node.getStatement().accept(this);
 
         LLVMBuildBr(llvmBuilder, loopConditionBlock);
+        LLVMMoveBasicBlockAfter(loopExitBlock, LLVMGetInsertBlock(llvmBuilder));
         LLVMPositionBuilderAtEnd(llvmBuilder, loopExitBlock);
     }
     
@@ -266,7 +304,6 @@ class CodeGenerator : AstVisitor {
                 } else {
                     llvmValue = opTerm.term.getLlvmValue();
                 }
-                node.setLlvmValue(llvmValue);
             } else {
                 opTerm.term.accept(this);
                 llvmValue = opTerm.term.getLlvmValue();
@@ -280,8 +317,8 @@ class CodeGenerator : AstVisitor {
                     default:
                         break;
                 }
-                node.setLlvmValue(llvmValue);
             }
+            node.setLlvmValue(llvmValue);
         }
     }
 
@@ -292,7 +329,6 @@ class CodeGenerator : AstVisitor {
             if (index == 0) {
                 opFactor.factor.accept(this);
                 llvmValue = opFactor.factor.getLlvmValue();
-                node.setLlvmValue(llvmValue);
             } else {
                 opFactor.factor.accept(this);
                 llvmValue = opFactor.factor.getLlvmValue();
@@ -306,8 +342,8 @@ class CodeGenerator : AstVisitor {
                     default:
                         break;
                 }
-                node.setLlvmValue(llvmValue);
             }
+            node.setLlvmValue(llvmValue);
         }
     }
 
@@ -335,6 +371,7 @@ class CodeGenerator : AstVisitor {
 
     void visit(ParenExpNode node) {
         node.getExpression().accept(this);
+        node.setLlvmValue(node.getExpression().getLlvmValue());
     }
 
 }
