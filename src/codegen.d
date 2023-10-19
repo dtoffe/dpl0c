@@ -65,6 +65,13 @@ class CodeGenerator : AstVisitor {
         LLVMTargetDataRef datalayout = LLVMCreateTargetDataLayout(machine);
         char *datalayout_str = LLVMCopyStringRepOfTargetData(datalayout);
         LLVMSetDataLayout(llvmModule, datalayout_str);
+
+        // Setup external functions
+        LLVMTypeRef readIntegerType = LLVMFunctionType(LLVMInt32Type(), null, 0, 0);
+        LLVMValueRef readIntegerDecl = LLVMAddFunction(llvmModule, "readInteger", readIntegerType);
+        LLVMTypeRef[] paramTypes = [LLVMInt32Type()];
+        LLVMTypeRef writeIntegerType = LLVMFunctionType(LLVMVoidType(), paramTypes.ptr, 1, 0);
+        LLVMValueRef writeIntegerDecl = LLVMAddFunction(llvmModule, "writeInteger", writeIntegerType);
     }
 
     void finalizeLLVM() {
@@ -191,15 +198,46 @@ class CodeGenerator : AstVisitor {
     }
 
     void visit(CallNode node) {
-        LLVMValueRef[] args = null;
+        LLVMValueRef[] functionArgs = null;
         LLVMValueRef calledFunction = LLVMGetNamedFunction(llvmModule, node.getIdentName().toStringz());
-        LLVMValueRef callInstruction = LLVMBuildCall(llvmBuilder, calledFunction, args.ptr,
-                                        cast(uint)args.length, node.getIdentName().toStringz());
+        LLVMValueRef callInstruction = LLVMBuildCall(llvmBuilder, calledFunction, functionArgs.ptr,
+                                                    cast(uint)functionArgs.length, node.getIdentName().toStringz());
     }
 
-    void visit(ReadNode node) {}
-    void visit(WriteNode node) {}
+    void visit(ReadNode node) {
+        Symbol foundSymbol;
+        string foundScopeName = null;
+        string symbolName = node.getVarName();
+        LLVMValueRef variableRef;
+        LLVMValueRef expressionValue;
+        if (lookupSymbol(symbolName, foundSymbol, foundScopeName)) {
+            variableRef = vars[symbolName ~ foundScopeName];
 
+            LLVMValueRef[] functionArgs = null;
+            LLVMValueRef readFunction = LLVMGetNamedFunction(llvmModule, "readInteger");
+            LLVMValueRef readCall = LLVMBuildCall(llvmBuilder, readFunction, functionArgs.ptr,
+                                                cast(uint)functionArgs.length, "read");
+
+            LLVMBuildStore(llvmBuilder, variableRef, readCall);
+        } else {
+            ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
+                    not found in scope: '" ~ foundScopeName ~ "'.");
+        }
+
+
+    }
+
+    void visit(WriteNode node) {
+        LLVMValueRef llvmExpressionValue;
+        node.getExpression().accept(this);
+        llvmExpressionValue = node.getExpression().getLlvmValue();
+        LLVMValueRef[] functionArgs = [llvmExpressionValue];
+        LLVMValueRef writeFunction = LLVMGetNamedFunction(llvmModule, "writeInteger");
+        //LLVMDumpValue(writeFunction);
+        LLVMValueRef writeCall = LLVMBuildCall(llvmBuilder, writeFunction, functionArgs.ptr,
+                                            cast(uint)functionArgs.length, "write");
+    }
+    
     void visit(BeginEndNode node) {
         foreach (index, statement; node.getStatements()) {
             statement.accept(this);
