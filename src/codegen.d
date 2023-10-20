@@ -40,7 +40,7 @@ class CodeGenerator : AstVisitor {
 
         // Setup LLVM main objects
         int32Type = LLVMInt32Type();
-        llvmContext = LLVMContextCreate();
+        llvmContext = LLVMGetGlobalContext();
         llvmModule = LLVMModuleCreateWithNameInContext((name ~ ".ll").toStringz(), llvmContext);
         llvmBuilder = LLVMCreateBuilderInContext(llvmContext);
 
@@ -65,13 +65,31 @@ class CodeGenerator : AstVisitor {
         LLVMTargetDataRef datalayout = LLVMCreateTargetDataLayout(machine);
         char *datalayout_str = LLVMCopyStringRepOfTargetData(datalayout);
         LLVMSetDataLayout(llvmModule, datalayout_str);
+    }
 
+    void setupExternals() {
         // Setup external functions
         LLVMTypeRef readIntegerType = LLVMFunctionType(LLVMInt32Type(), null, 0, 0);
         LLVMValueRef readIntegerDecl = LLVMAddFunction(llvmModule, "readInteger", readIntegerType);
         LLVMTypeRef[] paramTypes = [LLVMInt32Type()];
         LLVMTypeRef writeIntegerType = LLVMFunctionType(LLVMVoidType(), paramTypes.ptr, 1, 0);
         LLVMValueRef writeIntegerDecl = LLVMAddFunction(llvmModule, "writeInteger", writeIntegerType);
+    }
+
+    void verifyModuleAndPrint() {
+        LLVMVerifierFailureAction action = LLVMPrintMessageAction;
+        char* error = null;
+        LLVMBool result = LLVMVerifyModule(llvmModule, action, &error);
+        if (result != 0) {
+            writeln("Module verification failed:\n%s", error);
+            LLVMDisposeMessage(error);
+        } else {
+            writeln("Module verification succeeded!");
+        }
+
+        char *generatedCode = LLVMPrintModuleToString(llvmModule);
+        string output = to!string(generatedCode);
+        writeln(output);
     }
 
     void finalizeLLVM() {
@@ -85,6 +103,7 @@ class CodeGenerator : AstVisitor {
         writeln();
         writeln("Generating code for program ", name, " :");
         initializeLLVM();
+        setupExternals();
 
         LLVMTypeRef[] mainArgs = [LLVMInt32Type()];
         LLVMTypeRef mainFuncType = LLVMFunctionType(LLVMInt32Type(), mainArgs.ptr, cast(uint) mainArgs.length, false);
@@ -97,12 +116,9 @@ class CodeGenerator : AstVisitor {
         node.getBlock().accept(this);
         exitScope();
 
-        //LLVMPositionBuilderAtEnd(llvmBuilder, mainEntryBlock);
         LLVMBuildRet(llvmBuilder, LLVMConstInt(LLVMInt32Type(), 0, true));
 
-        char *generatedCode = LLVMPrintModuleToString(llvmModule);
-        string output = to!string(generatedCode);
-        writeln(output);
+        verifyModuleAndPrint();
 
         finalizeLLVM();
     }
@@ -173,6 +189,7 @@ class CodeGenerator : AstVisitor {
         enterScope(node.getProcName());
         node.getBlock().accept(this);
         exitScope();
+        LLVMBuildRet(llvmBuilder, LLVMConstInt(LLVMInt32Type(), 0, true));
         currentBasicBlock = parentBasicBlock;
         currentFunction = parentFunction;
         LLVMPositionBuilderAtEnd(llvmBuilder, currentBasicBlock);
@@ -190,7 +207,7 @@ class CodeGenerator : AstVisitor {
             node.getExpression().accept(this);
             variableRef = vars[symbolName ~ foundScopeName];
             expressionValue = node.getExpression.getLlvmValue();
-            LLVMBuildStore(llvmBuilder, variableRef, expressionValue);
+            LLVMBuildStore(llvmBuilder, expressionValue, variableRef);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
                     not found in scope: '" ~ foundScopeName ~ "'.");
@@ -201,7 +218,7 @@ class CodeGenerator : AstVisitor {
         LLVMValueRef[] functionArgs = null;
         LLVMValueRef calledFunction = LLVMGetNamedFunction(llvmModule, node.getIdentName().toStringz());
         LLVMValueRef callInstruction = LLVMBuildCall(llvmBuilder, calledFunction, functionArgs.ptr,
-                                                    cast(uint)functionArgs.length, node.getIdentName().toStringz());
+                                                    cast(uint)functionArgs.length, "");
     }
 
     void visit(ReadNode node) {
@@ -223,8 +240,6 @@ class CodeGenerator : AstVisitor {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
                     not found in scope: '" ~ foundScopeName ~ "'.");
         }
-
-
     }
 
     void visit(WriteNode node) {
@@ -235,7 +250,7 @@ class CodeGenerator : AstVisitor {
         LLVMValueRef writeFunction = LLVMGetNamedFunction(llvmModule, "writeInteger");
         //LLVMDumpValue(writeFunction);
         LLVMValueRef writeCall = LLVMBuildCall(llvmBuilder, writeFunction, functionArgs.ptr,
-                                            cast(uint)functionArgs.length, "write");
+                                            cast(uint)functionArgs.length, "");
     }
     
     void visit(BeginEndNode node) {
@@ -260,6 +275,7 @@ class CodeGenerator : AstVisitor {
         LLVMPositionBuilderAtEnd(llvmBuilder, ifTrueBlock);
 
         node.getStatement().accept(this);
+        LLVMBuildBr(llvmBuilder, ifExitBlock);
 
         LLVMMoveBasicBlockAfter(ifExitBlock, LLVMGetInsertBlock(llvmBuilder));
         LLVMPositionBuilderAtEnd(llvmBuilder, ifExitBlock);
