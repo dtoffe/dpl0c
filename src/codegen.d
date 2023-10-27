@@ -141,37 +141,37 @@ class CodeGenerator : AstVisitor {
     }
 
     void visit(ConstDeclNode node) {
-        Symbol foundSymbol;
-        string foundScopeName = null;
+        Symbol* foundSymbol;
         string symbolName = node.getConstName();
         LLVMValueRef valRef;
         LLVMValueRef constValue;
-        if (lookupSymbol(symbolName, foundSymbol, foundScopeName)) {
+        if ((foundSymbol = lookupSymbol(symbolName)) != null) {
             valRef = LLVMBuildAlloca(llvmBuilder, int32Type, symbolName.toStringz());
             constValue = LLVMConstInt(int32Type, node.getConstValue(), false);
             LLVMBuildStore(llvmBuilder, constValue, valRef);
-            vars[symbolName ~ foundScopeName] = valRef;
+            vars[symbolName ~ (*foundSymbol).scopeName] = valRef;
+            //node.getConstSymbol().setValueRef(valRef);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ foundScopeName ~ "'.");
+                    not found in scope: '" ~ (*foundSymbol).scopeName ~ "'.");
         }
     }
 
     void visit(VarDeclNode node) {
-        Symbol foundSymbol;
-        string foundScopeName = null;
+        Symbol* foundSymbol;
         string symbolName = node.getVarName();
         LLVMValueRef valRef;
         LLVMValueRef varValue;
-        if (lookupSymbol(symbolName, foundSymbol, foundScopeName)) {
+        if ((foundSymbol = lookupSymbol(symbolName)) != null) {
             valRef = LLVMBuildAlloca(llvmBuilder, int32Type, symbolName.toStringz());
             // All vars are initialized to 0 on declaration
             varValue = LLVMConstInt(int32Type, 0, false);
             LLVMBuildStore(llvmBuilder, varValue, valRef);
-            vars[symbolName ~ foundScopeName] = valRef;
+            vars[symbolName ~ (*foundSymbol).scopeName] = valRef;
+            //node.getVarSymbol().setValueRef(valRef);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ foundScopeName ~ "'.");
+                    not found in scope: '" ~ (*foundSymbol).scopeName ~ "'.");
         }
     }
 
@@ -198,19 +198,23 @@ class CodeGenerator : AstVisitor {
     //void visit(StatementNode node); // abstract
     
     void visit(AssignNode node) {
-        Symbol foundSymbol;
-        string foundScopeName = null;
+        Symbol* foundSymbol;
         string symbolName = node.getIdentName();
         LLVMValueRef variableRef;
         LLVMValueRef expressionValue;
-        if (lookupSymbol(symbolName, foundSymbol, foundScopeName)) {
+        if ((foundSymbol = lookupSymbol(symbolName)) != null) {
             node.getExpression().accept(this);
-            variableRef = vars[symbolName ~ foundScopeName];
+            variableRef = vars[symbolName ~ (*foundSymbol).scopeName];
+            // writeln("Vars: " ~ node.getIdentSymbol().name);
+            // LLVMDumpValue(vars[symbolName ~ foundScopeName]);
+            // writeln("Node: ");
+            // LLVMDumpValue(node.getIdentSymbol().getValueRef());
+            // variableRef = node.getIdentSymbol().getValueRef();
             expressionValue = node.getExpression.getLlvmValue();
             LLVMBuildStore(llvmBuilder, expressionValue, variableRef);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ foundScopeName ~ "'.");
+                    not found in scope: '" ~ (*foundSymbol).scopeName ~ "'.");
         }
     }
 
@@ -222,13 +226,15 @@ class CodeGenerator : AstVisitor {
     }
 
     void visit(ReadNode node) {
-        Symbol foundSymbol;
-        string foundScopeName = null;
+        Symbol* foundSymbol;
         string symbolName = node.getVarName();
         LLVMValueRef variableRef;
         LLVMValueRef expressionValue;
-        if (lookupSymbol(symbolName, foundSymbol, foundScopeName)) {
-            variableRef = vars[symbolName ~ foundScopeName];
+        if ((foundSymbol = lookupSymbol(symbolName)) != null) {
+            variableRef = vars[symbolName ~ (*foundSymbol).scopeName];
+            // LLVMDumpValue(vars[symbolName ~ foundScopeName]);
+            // LLVMDumpValue(node.getVarSymbol().getValueRef());
+            // variableRef = node.getVarSymbol().getValueRef();
 
             LLVMValueRef[] functionArgs = null;
             LLVMValueRef readFunction = LLVMGetNamedFunction(llvmModule, "readInteger");
@@ -238,7 +244,7 @@ class CodeGenerator : AstVisitor {
             LLVMBuildStore(llvmBuilder, variableRef, readCall);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ foundScopeName ~ "'.");
+                    not found in scope: '" ~ (*foundSymbol).scopeName ~ "'.");
         }
     }
 
@@ -410,15 +416,17 @@ class CodeGenerator : AstVisitor {
     }
 
     void visit(VariableNode node) {
-        Symbol foundSymbol;
-        string foundScopeName = null;
+        Symbol* foundSymbol;
         string symbolName = node.getVarName();
         LLVMValueRef variableRef;
-        if (lookupSymbol(symbolName, foundSymbol, foundScopeName)) {
-            variableRef = LLVMBuildLoad(llvmBuilder, vars[symbolName ~ foundScopeName], symbolName.toStringz());
+        if ((foundSymbol = lookupSymbol(symbolName)) != null) {
+            variableRef = LLVMBuildLoad(llvmBuilder, vars[symbolName ~ (*foundSymbol).scopeName], symbolName.toStringz());
+            // LLVMDumpValue(vars[symbolName ~ foundScopeName]);
+            // LLVMDumpValue(node.getVarSymbol().getValueRef());
+            // variableRef = LLVMBuildLoad(llvmBuilder, node.getVarSymbol().getValueRef(), symbolName.toStringz());
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ foundScopeName ~ "'.");
+                    not found in scope: '" ~ (*foundSymbol).scopeName ~ "'.");
         }
         node.setLlvmValue(variableRef);
     }

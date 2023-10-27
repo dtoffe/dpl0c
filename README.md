@@ -1,6 +1,6 @@
 # dpl0c
 
-[![built with the help of Codeium](https://codeium.com/badges/main)](https://codeium.com)
+[![built with Codeium](https://codeium.com/badges/main)](https://codeium.com)
 
 A PL/0 compiler written in D. This is the grammar of the PL/0 language:
 

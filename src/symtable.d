@@ -32,11 +32,23 @@ enum SymbolType {
 }
 
 struct Symbol {
+
     //int id;
     string name;
+    string scopeName;
     SymbolKind kind;
     SymbolType type;
     int value;  // This is the value for consts and vars, and zero for procedures
+    LLVMValueRef valueRef;
+
+    public LLVMValueRef getValueRef() {
+        return valueRef;
+    }
+
+    public void setValueRef(LLVMValueRef valueRef) {
+        this.valueRef = valueRef;
+    }
+
 }
 
 // A struct can not contain a field of the same struct type, that's why a class is used
@@ -90,13 +102,17 @@ static void exitScope() {
 }
 
 static bool createSymbol(string name, SymbolKind kind, SymbolType type, int value) {
-    Symbol entry = Symbol(name, kind, type);
+    Symbol entry = Symbol();
+    entry.name = name;
+    entry.scopeName = currentScope.name;
+    entry.kind = kind;
+    entry.type = type;
+    //entry.value = value;
     if (!(name in currentScope.symbolTable)) {
-        Symbol foundSymbol;
-        string foundScopeName = null;
-        if (lookupSymbol(name, foundSymbol, foundScopeName)) {
+        Symbol* foundSymbol;
+        if ((foundSymbol = lookupSymbol(name)) != null) {
             ErrorManager.addScopeError(ErrorLevel.WARNING, "Warning: Local Identifier '" ~
-                    name ~ "' hides another identifier declared in scope: " ~ foundScopeName);
+                    name ~ "' hides another identifier declared in scope: " ~ (*foundSymbol).scopeName);
         }
         currentScope.symbolTable[name] = entry;
         writeln("Created new symbol: " ~ name ~ " in scope: " ~ currentScope.name);
@@ -109,16 +125,14 @@ static bool createSymbol(string name, SymbolKind kind, SymbolType type, int valu
     }
 }
 
-static bool lookupSymbol(string name, ref Symbol foundSymbol, ref string foundScopeName) {
+static Symbol* lookupSymbol(string name) {
     Scope searchScope = currentScope;
     while (searchScope !is null) {
         if (name in searchScope.symbolTable) {
-            foundSymbol = searchScope.symbolTable[name];
-            foundScopeName = searchScope.name;
-            return true;
+            return &(searchScope.symbolTable[name]);
         } else {
             searchScope = searchScope.parent;
         }
     }
-    return false;
+    return null;
 }
