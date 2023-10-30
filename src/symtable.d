@@ -31,18 +31,29 @@ enum SymbolType {
     INTEGER
 }
 
+static int nextId = 0;
+
 struct Symbol {
 
-    //int id;
+    int id;
     string name;
     string scopeName;
     SymbolKind kind;
     SymbolType type;
-    int value;  // This is the value for consts and vars, and zero for procedures
+    int value;  // This is the value for consts (and maybe vars?), and zero for procedures
     LLVMValueRef valueRef;
 
+    this(string name, SymbolKind kind, SymbolType type, int value) {
+        this.id = nextId++;
+        this.name = name;
+        this.scopeName = currentScope.name;
+        this.kind = kind;
+        this.type = type;
+        this.value = value;
+    }
+
     public LLVMValueRef getValueRef() {
-        return valueRef;
+        return this.valueRef;
     }
 
     public void setValueRef(LLVMValueRef valueRef) {
@@ -64,7 +75,7 @@ static Scope currentScope;
 
 static Scope[string] scopes;
 
-//static Symbol[int] symbols;
+static Symbol[int] symbols;
 
 static void createScope(string name) {
     if (mainScope is null) {
@@ -102,12 +113,7 @@ static void exitScope() {
 }
 
 static bool createSymbol(string name, SymbolKind kind, SymbolType type, int value) {
-    Symbol entry = Symbol();
-    entry.name = name;
-    entry.scopeName = currentScope.name;
-    entry.kind = kind;
-    entry.type = type;
-    //entry.value = value;
+    Symbol entry = Symbol(name, kind, type, value);
     if (!(name in currentScope.symbolTable)) {
         Symbol* foundSymbol;
         if ((foundSymbol = lookupSymbol(name)) != null) {
@@ -115,6 +121,7 @@ static bool createSymbol(string name, SymbolKind kind, SymbolType type, int valu
                     name ~ "' hides another identifier declared in scope: " ~ (*foundSymbol).scopeName);
         }
         currentScope.symbolTable[name] = entry;
+        symbols[entry.id] = entry;
         writeln("Created new symbol: " ~ name ~ " in scope: " ~ currentScope.name);
         return true;
     } else {

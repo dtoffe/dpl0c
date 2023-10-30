@@ -55,7 +55,7 @@ class ScopeChecker : AstVisitor {
         Symbol* foundSymbol;
         string symbolName = node.getConstName();
         if ((foundSymbol = lookupSymbol(symbolName)) != null) {
-            node.setConstSymbol(*foundSymbol);
+            node.setSymbolId((*foundSymbol).id);
         }
     }
 
@@ -64,7 +64,7 @@ class ScopeChecker : AstVisitor {
         Symbol* foundSymbol;
         string symbolName = node.getVarName();
         if ((foundSymbol = lookupSymbol(symbolName)) != null) {
-            node.setVarSymbol(*foundSymbol);
+            node.setSymbolId((*foundSymbol).id);
         }
     }
 
@@ -73,7 +73,7 @@ class ScopeChecker : AstVisitor {
         Symbol* foundSymbol;
         string symbolName = node.getProcName();
         if ((foundSymbol = lookupSymbol(symbolName)) != null) {
-            node.setProcSymbol(*foundSymbol);
+            node.setSymbolId((*foundSymbol).id);
         }
         symtable.createScope(node.getProcName());
         //symtable.enterScope(node.getProcName());
@@ -99,7 +99,7 @@ class ScopeChecker : AstVisitor {
                         symbolName ~ "' cannot be assigned a value.");
             }
             writeln("Assign to variable: " ~ symbolName ~ " in scope: " ~ (*foundSymbol).scopeName);
-            node.setIdentSymbol(*foundSymbol);
+            node.setSymbolId((*foundSymbol).id);
         } else {
             ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
                     symbolName ~ "' is undeclared in the current and all enclosing scopes.");
@@ -120,7 +120,7 @@ class ScopeChecker : AstVisitor {
                         symbolName ~ "' cannot be called.");
             }
             writeln("Call to procedure: " ~ symbolName ~ " in scope: " ~ (*foundSymbol).scopeName);
-            node.setIdentSymbol(*foundSymbol);
+            node.setSymbolId((*foundSymbol).id);
         } else {
             ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
                     symbolName ~ "' is undeclared in the current and all enclosing scopes.");
@@ -140,7 +140,7 @@ class ScopeChecker : AstVisitor {
                         symbolName ~ "' cannot be read into.");
             }
             writeln("Read into variable: " ~ symbolName ~ " in scope: " ~ (*foundSymbol).scopeName);
-            node.setVarSymbol(*foundSymbol);
+            node.setSymbolId((*foundSymbol).id);
         } else {
             ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
                     symbolName ~ "' is undeclared in the current and all enclosing scopes.");
@@ -218,7 +218,7 @@ class ScopeChecker : AstVisitor {
             if (foundSymbol.kind == SymbolKind.VAR) {
                 writeln("Referenced variable: " ~ symbolName ~ " in scope: " ~ (*foundSymbol).scopeName);
             }
-            node.setVarSymbol(*foundSymbol);
+            node.setSymbolId((*foundSymbol).id);
         } else {
             ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
                     symbolName ~ "' is undeclared in the current and all enclosing scopes.");

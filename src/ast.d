@@ -6,6 +6,7 @@ module ast;
 
 import llvm;
 import std.conv;
+import std.stdio;
 import symtable;
 import token;
 
@@ -85,7 +86,7 @@ class ConstDeclNode : AstNode {
 
     string constName;
     int constValue;
-    Symbol constSymbol;
+    int symbolId;
 
     this(string constName, int constValue) {
         this.constName = constName;
@@ -100,12 +101,12 @@ class ConstDeclNode : AstNode {
         return constValue;
     }
 
-    Symbol getConstSymbol() {
-        return constSymbol;
+    int getSymbolId() {
+        return symbolId;
     }
 
-    void setConstSymbol(Symbol constSymbol) {
-        this.constSymbol = constSymbol;
+    void setSymbolId(int symbolId) {
+        this.symbolId = symbolId;
     }
 
     override void accept(AstVisitor visitor) {
@@ -117,7 +118,7 @@ class ConstDeclNode : AstNode {
 class VarDeclNode : AstNode {
 
     string varName;
-    Symbol varSymbol;
+    int symbolId;
  
     this(string varName) {
         this.varName = varName;
@@ -127,12 +128,12 @@ class VarDeclNode : AstNode {
         return varName;
     }
     
-    Symbol getVarSymbol() {
-        return varSymbol;
+    int getSymbolId() {
+        return symbolId;
     }
 
-    void setVarSymbol(Symbol varSymbol) {
-        this.varSymbol = varSymbol;
+    void setSymbolId(int symbolId) {
+        this.symbolId = symbolId;
     }
 
     override void accept(AstVisitor visitor) {
@@ -144,7 +145,7 @@ class VarDeclNode : AstNode {
 class ProcDeclNode : AstNode {
 
     string procName;
-    Symbol procSymbol;
+    int symbolId;
     BlockNode block;
 
     this(string procName, BlockNode block) {
@@ -156,12 +157,12 @@ class ProcDeclNode : AstNode {
         return procName;
     }
 
-    Symbol getProcSymbol() {
-        return procSymbol;
+    int getSymbolId() {
+        return symbolId;
     }
 
-    void setProcSymbol(Symbol procSymbol) {
-        this.procSymbol = procSymbol;
+    void setSymbolId(int symbolId) {
+        this.symbolId = symbolId;
     }
 
     BlockNode getBlock() {
@@ -181,7 +182,7 @@ abstract class StatementNode : AstNode {
 class AssignNode : StatementNode {
 
     string identName;
-    Symbol identSymbol;
+    int symbolId;
     ExpressionNode expression;
 
     this(string identName, ExpressionNode expression) {
@@ -193,12 +194,12 @@ class AssignNode : StatementNode {
         return identName;
     }
 
-    Symbol getIdentSymbol() {
-        return identSymbol;
+    int getSymbolId() {
+        return symbolId;
     }
 
-    void setIdentSymbol(Symbol identSymbol) {
-        this.identSymbol = identSymbol;
+    void setSymbolId(int symbolId) {
+        this.symbolId = symbolId;
     }
 
     ExpressionNode getExpression() {
@@ -214,7 +215,7 @@ class AssignNode : StatementNode {
 class CallNode : StatementNode {
 
     string identName;
-    Symbol identSymbol;
+    int symbolId;
 
     this(string identName) {
         this.identName = identName;
@@ -224,12 +225,12 @@ class CallNode : StatementNode {
         return identName;
     }
     
-    Symbol getIdentSymbol() {
-        return identSymbol;
+    int getSymbolId() {
+        return symbolId;
     }
 
-    void setIdentSymbol(Symbol identSymbol) {
-        this.identSymbol = identSymbol;
+    void setSymbolId(int symbolId) {
+        this.symbolId = symbolId;
     }
 
     override void accept(AstVisitor visitor) {
@@ -241,7 +242,7 @@ class CallNode : StatementNode {
 class ReadNode : StatementNode {
 
     string varName;
-    Symbol varSymbol;
+    int symbolId;
 
     this(string varName) {
         this.varName = varName;
@@ -251,12 +252,12 @@ class ReadNode : StatementNode {
         return varName;
     }
 
-    Symbol getVarSymbol() {
-        return varSymbol;
+    int getSymbolId() {
+        return symbolId;
     }
 
-    void setVarSymbol(Symbol varSymbol) {
-        this.varSymbol = varSymbol;
+    void setSymbolId(int symbolId) {
+        this.symbolId = symbolId;
     }
 
     override void accept(AstVisitor visitor) {
@@ -504,7 +505,7 @@ class NumberNode : FactorNode {
 class VariableNode : FactorNode {
     
     string varName;
-    Symbol varSymbol;
+    int symbolId;
 
     this(string varName) {
         this.varName = varName;
@@ -514,12 +515,12 @@ class VariableNode : FactorNode {
         return varName;
     }
 
-    Symbol getVarSymbol() {
-        return varSymbol;
+    int getSymbolId() {
+        return symbolId;
     }
 
-    void setVarSymbol(Symbol varSymbol) {
-        this.varSymbol = varSymbol;
+    void setSymbolId(int symbolId) {
+        this.symbolId = symbolId;
     }
 
     override void accept(AstVisitor visitor) {
