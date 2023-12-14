@@ -2,7 +2,7 @@
  * Copyright (c) 2023 Alejandro Daniel Toffetti
  * You can find the complete text of the license in the file LICENSE at the root of this project.
  */
-module codegen;
+module codegen_llvm;
 
 import llvm;
 import std.conv;
@@ -13,7 +13,7 @@ import error;
 import symtable;
 import token;
 
-class CodeGenerator : AstVisitor {
+class LLVMCodeGenerator : AstVisitor {
 
     string name;
     bool emitDebugInfo;
@@ -197,10 +197,12 @@ class CodeGenerator : AstVisitor {
         Symbol* foundSymbol;
         string symbolName = node.getIdentName();
         LLVMValueRef variableRef;
+        //LLVMValueRef tempRef;
         LLVMValueRef expressionValue;
         if ((foundSymbol = lookupSymbol(symbolName)) != null) {
             node.getExpression().accept(this);
             variableRef = symbols[node.getSymbolId()].getValueRef();
+        //    tempRef = LLVMBuildLoad(llvmBuilder, variableRef, "tmp");
             expressionValue = node.getExpression.getLlvmValue();
             LLVMBuildStore(llvmBuilder, expressionValue, variableRef);
         } else {

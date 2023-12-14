@@ -42,7 +42,13 @@ The compiler is written in D and features:
 - AST traversal implemented with a Visitor pattern.
   - :heavy_check_mark: A prettyprinter visitor.
   - :warning: A symbol table builder and semantic checking visitor.
-  - :construction: A code generation visitor acting as the backend, generating LLVM IR.
+  - :construction: A handful of visitors for the code generation backend.
+- Code generators:
+  - :construction: A transpiling code generator which emits Pascal source code. (Granted, reading PL/0 and emitting Pascal should count as cheating).
+  - :construction: An [LLVM IR](https://llvm.org/) code generator (almost finished).
+  - :interrobang: A transpiling code generator which emits C source code. (Other languages do this, so probably not cheating, or cheating not so much).
+  - :interrobang: A [QBE](https://c9x.me/compile/) code generator.
+  - :interrobang: Maybe I consider adding a CLR bytecode generator and a JVM bytecode generator in the future, just for learning purposes.
 - :construction: Runtime library in C for the implementation of "read" and "write".
 
 There is no plan for adding features to the language, as commonly done in the compiler courses where PL0 is used as target language.

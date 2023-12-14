@@ -7,7 +7,7 @@ module dpl0c;
 import std.file;
 import std.stdio;
 import ast;
-import codegen;
+import codegen_llvm;
 import error;
 import lexer;
 import parser;
@@ -39,8 +39,8 @@ void main(string[] args) {
     node.accept(checker);
     ErrorManager.printErrors();
 
-    CodeGenerator codeGenerator = new CodeGenerator(sourceFileName, false);
-    node.accept(codeGenerator);
+    LLVMCodeGenerator llvmCodeGenerator = new LLVMCodeGenerator(sourceFileName, false);
+    node.accept(llvmCodeGenerator);
     // ErrorManager.printErrors();
 
 }
