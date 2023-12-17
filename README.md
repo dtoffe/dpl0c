@@ -28,7 +28,17 @@ expression = [ "+" | "-" ] term { ( "+" | "-" ) term } ;
 term = factor { ( "*" | "/" ) factor } ;
 
 factor = ident | number | "(" expression ")" ;
+
+ident = letter { letter | digit } ;
+
+number = digit { digit } ;
+
+letter = "a" | "b" | ... | "y" | "z" | "A" | "B" | ... | "Y" | "Z" ;
+
+digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
 ```
+
+Comments start with "//", on its own line or after a statement, and go until the end of the line.
 
 The compiler is written in D and features:
 
