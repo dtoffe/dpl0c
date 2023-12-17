@@ -198,7 +198,7 @@ private:
 
     string readIdent() {
         auto col = column;
-        while (isLetter(peekNext())) {
+        while (isLetter(peekNext()) || isDigit(peekNext())) {
             readChar();
         }
         return sourceLines[line][col - 1 .. column];
