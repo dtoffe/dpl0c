@@ -21,7 +21,7 @@ procedure calculate;
 
     procedure sub;
     begin
-        x := x – y
+        x := x - y
     end;
 
     procedure mult;
@@ -32,7 +32,7 @@ procedure calculate;
 
     procedure div;
     begin
-        /* check for divide-by-zero errors */
+        // check for divide-by-zero errors
         if y # 0 then
             x := x / y;
         if y = 0 then

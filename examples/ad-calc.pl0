@@ -20,7 +20,7 @@ end;
 
 procedure sub;
 begin
-    x := x – y;
+    x := x - y;
     write x
 end;
 
@@ -32,12 +32,12 @@ end;
 
 procedure div;
 begin
-    /* check for divide-by-zero errors */
+    // Check for divide-by-zero errors
     if y # 0 then
     begin
         x := x / y;
         write x
-    end
+    end;
     if y = 0 then
         done := 1
 end;
