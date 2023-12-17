@@ -1,3 +1,7 @@
+// Source: https://en.wikipedia.org/wiki/PL/0
+// PL/0 grammar from Wikipedia, completed with the lexical elements not specified there.
+// Comments start with "//", on its own line or after a statement, and go until the end of the line.
+
 program = block "." ;
 
 block = [ "const" ident "=" number { "," ident "=" number } ";" ]
