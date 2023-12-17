@@ -51,7 +51,7 @@ The compiler is written in D and features:
   - :interrobang: Maybe I consider adding a CLR bytecode generator and a JVM bytecode generator in the future, just for learning purposes.
 - :construction: Runtime library in C for the implementation of "read" and "write".
 
-There is no plan for adding features to the language, as commonly done in the compiler courses where PL0 is used as target language.
+There is no plan for adding features to the language, as commonly done in the compiler courses where PL/0 is used as target language.
 
 I'm yet undecided about adding optimization passes.
 
