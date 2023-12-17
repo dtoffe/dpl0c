@@ -197,10 +197,18 @@ class PrettyPrinter : AstVisitor {
         foreach (index, opTerm; opTerms) {
             switch (opTerm.operator) {
                 case TokenType.PLUS:
-                    write(" + ");
+                    if (index == 0) {   // Unary +
+                        write("+");
+                    } else {
+                        write(" + ");
+                    }
                     break;
                 case TokenType.MINUS:
-                    write(" - ");
+                    if (index == 0) {   // Unary -
+                        write("-");
+                    } else {
+                        write(" - ");
+                    }
                     break;
                 default:
                     break;
