@@ -1,0 +1,34 @@
+// Source: https://github.com/addiedx44/pl0-compiler/blob/master/doc/PL0%20User's%20Manual.pdf
+//      PL/0 User Manual by Adam Dunson (2012) (page 6 - Recursive Procedures)
+//
+// Modified to agree with this implementation's exact grammar (..\docs\PL-0%20Grammar.txt):
+// - No "else"" in "if" statements.
+// - Semicolon is a statement separator, not a finalizer.
+// - Replace "in" and "out" by "read" and "write".
+// - Use "#" instead of "<>" for not-equal.
+// - Use "var" to declare variables, instead of "int".
+
+var f, n;
+
+procedure fact;
+var ans1;
+begin
+    ans1 := n;
+    n := n - 1;
+    if n = 0 then
+        f := 1;
+    if n > 0 then
+        call fact;
+    f := f * ans1
+end;
+
+begin
+    read n;
+    if n < 0 then
+        f := -1;
+    if n = 0 then
+        f := 1;
+    if n > 0 then
+        call fact;
+    write f
+end.

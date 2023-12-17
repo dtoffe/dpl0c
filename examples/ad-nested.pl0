@@ -1,0 +1,71 @@
+// Source: https://github.com/addiedx44/pl0-compiler/blob/master/doc/PL0%20User's%20Manual.pdf
+//      PL/0 User Manual by Adam Dunson (2012) (page 7 - Nested Procedures)
+//
+// Modified to agree with this implementation's exact grammar (..\docs\PL-0%20Grammar.txt):
+// - No "else"" in "if" statements.
+// - Semicolon is a statement separator, not a finalizer.
+// - Replace "in" and "out" by "read" and "write".
+// - Use "#" instead of "<>" for not-equal.
+// - Use "var" to declare variables, instead of "int".
+
+const ADD = 1, SUB = 2, MULT = 3, DIV = 4;
+
+var op, x, y, done;
+
+procedure calculate;
+
+    procedure add;
+    begin
+        x := x + y
+    end;
+
+    procedure sub;
+    begin
+        x := x – y
+    end;
+
+    procedure mult;
+    var c;
+    begin
+        x := x * y
+    end;
+
+    procedure div;
+    begin
+        /* check for divide-by-zero errors */
+        if y # 0 then
+            x := x / y;
+        if y = 0 then
+            done := 1
+    end;
+
+    begin
+        if op = ADD then
+            call add;
+        if op = SUB then
+            call sub;
+        if op = MULT then
+            call mult;
+        if op = DIV then
+            call div;
+        if done = 0 then
+            write x
+    end;
+
+begin
+    done := 0;
+    read x;
+    while done = 0 do
+    begin
+        read op;
+        if op < 1 then
+            done := 1;
+        if op > 4 then
+            done := 1;
+        if done = 0 then
+        begin
+            read y;
+            call calculate
+        end
+    end
+end.
