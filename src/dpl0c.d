@@ -8,6 +8,7 @@ import std.file;
 import std.stdio;
 import ast;
 import codegen_llvm;
+import codegen_pascal;
 import error;
 import lexer;
 import parser;
@@ -39,8 +40,12 @@ void main(string[] args) {
     node.accept(checker);
     ErrorManager.printErrors();
 
-    LLVMCodeGenerator llvmCodeGenerator = new LLVMCodeGenerator(sourceFileName, false);
-    node.accept(llvmCodeGenerator);
+    // LLVMCodeGenerator llvmCodeGenerator = new LLVMCodeGenerator(sourceFileName, false);
+    // node.accept(llvmCodeGenerator);
+    // // ErrorManager.printErrors();
+
+    PascalCodeGenerator pascalCodeGenerator = new PascalCodeGenerator(sourceFileName);
+    node.accept(pascalCodeGenerator);
     // ErrorManager.printErrors();
 
 }

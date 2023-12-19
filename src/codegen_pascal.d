@@ -14,7 +14,7 @@ import error;
 import symtable;
 import token;
 
-class LLVMCodeGenerator : AstVisitor {
+class PascalCodeGenerator : AstVisitor {
 
     string name;
     private int indentLevel = 0;
@@ -32,8 +32,8 @@ class LLVMCodeGenerator : AstVisitor {
         indentLevel--;
     }
 
-    private string printIndent() {
-        return to!string(repeat(' ', indentLevel * 4));
+    private void printIndent() {
+        emit(to!string(repeat(' ', indentLevel * 4)));
     }
 
     private void emit(string text) {
@@ -44,7 +44,10 @@ class LLVMCodeGenerator : AstVisitor {
         writeln();
         writeln("Generating code for program ", name, " :");
 
-        emit("program " ~ name ~ ";\n");
+        emit("\n");
+        emit("\n");
+        string result = name[11..name.indexOf(".", 2)];
+        emit("program " ~ result ~ ";\n");
         emit("\n");
 
         enterScope("main");
@@ -58,7 +61,9 @@ class LLVMCodeGenerator : AstVisitor {
     }
 
     void visit(BlockNode node) {
+        indent();
         if (node.getConstDecls().length > 0) {
+            printIndent();
             emit("const\n");
             indent();
             foreach (index, constant; node.getConstDecls()) {
@@ -73,6 +78,7 @@ class LLVMCodeGenerator : AstVisitor {
             emit("\n");
         }
         if (node.getVarDecls().length > 0) {
+            printIndent();
             emit("var\n");
             indent();
             foreach (index, variable; node.getVarDecls()) {
@@ -89,6 +95,7 @@ class LLVMCodeGenerator : AstVisitor {
         foreach (index, procedure; node.getProcDecls()) {
             procedure.accept(this);
         }
+        unindent();
         node.statement.accept(this);
     }
 
@@ -117,7 +124,9 @@ class LLVMCodeGenerator : AstVisitor {
     }
 
     void visit(ProcDeclNode node) {
-        emit("procedure " ~ node.getProcName ~ "();");
+        printIndent();
+        emit("procedure " ~ node.getProcName ~ "();\n");
+        emit("\n");
         enterScope(node.getProcName());
         node.getBlock().accept(this);
         exitScope();
@@ -166,7 +175,7 @@ class LLVMCodeGenerator : AstVisitor {
     
     void visit(BeginEndNode node) {
         printIndent();
-        emit("begin");
+        emit("begin\n");
         indent();
         foreach (index, statement; node.getStatements()) {
             statement.accept(this);
@@ -241,10 +250,18 @@ class LLVMCodeGenerator : AstVisitor {
         foreach (index, opTerm; opTerms) {
             switch (opTerm.operator) {
                 case TokenType.PLUS:
-                    emit(" + ");
+                    if (index == 0) {   // Unary +
+                        emit("+");
+                    } else {
+                        emit(" + ");
+                    }
                     break;
                 case TokenType.MINUS:
-                    emit(" - ");
+                    if (index == 0) {   // Unary -
+                        emit("-");
+                    } else {
+                        emit(" - ");
+                    }
                     break;
                 default:
                     break;
