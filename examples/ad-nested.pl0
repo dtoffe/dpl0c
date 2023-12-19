@@ -39,18 +39,18 @@ procedure calculate;
             done := 1
     end;
 
-    begin
-        if op = ADD then
-            call add;
-        if op = SUB then
-            call sub;
-        if op = MULT then
-            call mult;
-        if op = DIV then
-            call div;
-        if done = 0 then
-            write x
-    end;
+begin
+    if op = ADD then
+        call add;
+    if op = SUB then
+        call sub;
+    if op = MULT then
+        call mult;
+    if op = DIV then
+        call div;
+    if done = 0 then
+        write x
+end;
 
 begin
     done := 0;
