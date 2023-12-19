@@ -39,7 +39,9 @@ class PrettyPrinter : AstVisitor {
 
     void visit(BlockNode node) {
         writeln("");
+        indent();
         if (node.getConstDecls().length > 0) {
+            printIndent();
             writeln("const");
             indent();
             foreach (index, constant; node.getConstDecls()) {
@@ -55,6 +57,7 @@ class PrettyPrinter : AstVisitor {
             writeln("");
         }
         if (node.getVarDecls().length > 0) {
+            printIndent();
             writeln("var");
             indent();
             foreach (index, variable; node.getVarDecls()) {
@@ -71,6 +74,7 @@ class PrettyPrinter : AstVisitor {
         foreach (index, procedure; node.getProcDecls()) {
             procedure.accept(this);
         }
+        unindent();
         node.statement.accept(this);
     }
 
@@ -85,6 +89,7 @@ class PrettyPrinter : AstVisitor {
     }
 
     void visit(ProcDeclNode node) {
+        printIndent();
         writeln("procedure ", node.getProcName(), ";");
         node.getBlock().accept(this);
         writeln(";");
