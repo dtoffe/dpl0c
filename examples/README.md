@@ -2,7 +2,7 @@
 
 When I started this project I took the three examples form the [PL/0](https://en.wikipedia.org/wiki/PL/0) page on Wikipedia to test the lexer and the parser with them. These are the "wp" examples.
 
-``` PL/0
+``` Pascal
 // Square
 
 var x, squ;
@@ -23,7 +23,7 @@ begin
 end.
 ```
 
-``` PL/0
+``` Pascal
 // Primes
 
 const max = 100;
@@ -59,7 +59,7 @@ end;
 call primes.
 ```
 
-``` PL/0
+``` Pascal
 // Math
 
 var x, y, z, q, r, n, f;
@@ -140,7 +140,7 @@ I had to apply these modifications to the source code of the examples in Adam's 
 - Use "#" instead of "<>" for not-equal.
 - Use "var" to declare variables, instead of "int".
 
-``` PL/0
+``` Pascal
 // Calc
 
 const ADD = 1, SUB = 2, MULT = 3, DIV = 4;
@@ -204,7 +204,7 @@ begin
 end.
 ```
 
-``` PL/0
+``` Pascal
 // Nested
 
 const ADD = 1, SUB = 2, MULT = 3, DIV = 4;
@@ -270,7 +270,7 @@ begin
 end.
 ```
 
-``` PL/0
+``` Pascal
 // Recursive
 
 var f, n;
