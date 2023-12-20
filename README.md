@@ -4,7 +4,7 @@
 
 A [PL/0](https://en.wikipedia.org/wiki/PL/0) compiler written in [D language](https://dlang.org/). This is the grammar of the PL/0 language:
 
-``` BNF
+``` EBNF
 program = block "." ;
 
 block = [ "const" ident "=" number { "," ident "=" number } ";" ]
