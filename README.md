@@ -67,6 +67,10 @@ I'm yet undecided about adding optimization passes.
 
 I would love, however, adding error recovery to the parser, for example via symbol insertion of missing semicolons. But I've still got to figure out how to do it.
 
+## Examples
+
+Take a look at the examples in the [examples/README.md](examples/README.md) file.
+
 ## Thanks to
 
 - The guys at the D language forum, for some general language tips at the beginning of the project.
