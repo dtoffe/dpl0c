@@ -2,7 +2,7 @@
 
 [![built with Codeium](https://codeium.com/badges/main)](https://codeium.com)
 
-A PL/0 compiler written in D. This is the grammar of the PL/0 language:
+A [PL/0](https://en.wikipedia.org/wiki/PL/0) compiler written in [D language](https://dlang.org/). This is the grammar of the PL/0 language:
 
 ``` BNF
 program = block "." ;
