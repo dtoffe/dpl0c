@@ -1,4 +1,4 @@
-program wp-math;
+program math;
 
     var
         x,
@@ -7,13 +7,13 @@ program wp-math;
         q,
         r,
         n,
-        f;
+        f : integer;
 
     procedure multiply();
 
         var
             a,
-            b;
+            b : integer;
 
     begin
         a := x;
@@ -24,14 +24,14 @@ program wp-math;
                 if (b) mod 2 = 1 then
                     z := z + a;
                 a := 2 * a;
-                b := b / 2
+                b := b div 2
             end
     end;
 
     procedure divide();
 
         var
-            w;
+            w : integer;
 
     begin
         r := x;
@@ -42,7 +42,7 @@ program wp-math;
         while w > y do
             begin
                 q := 2 * q;
-                w := w / 2;
+                w := w div 2;
                 if w <= r then
                     begin
                         r := r - w;
@@ -55,7 +55,7 @@ program wp-math;
 
         var
             f,
-            g;
+            g : integer;
 
     begin
         f := x;

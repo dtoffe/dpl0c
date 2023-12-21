@@ -1,4 +1,4 @@
-program ad-recursive;
+program recursive;
 
     var
         f,

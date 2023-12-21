@@ -1,4 +1,4 @@
-program ad-calc;
+program calc;
 
     const
         ADD = 1,

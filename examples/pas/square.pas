@@ -1,8 +1,8 @@
-program wp-square;
+program square;
 
     var
         x,
-        squ;
+        squ : integer;
 
     procedure square();
 

@@ -1,16 +1,16 @@
-program wp-primes;
+program primes;
 
     const
         max = 100;
 
     var
         arg,
-        ret;
+        ret : integer;
 
     procedure isprime();
 
         var
-            i;
+            i : integer;
 
     begin
         ret := 1;
