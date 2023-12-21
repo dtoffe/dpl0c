@@ -1,6 +1,6 @@
 # Examples
 
-When I started this project I took the three examples form the [PL/0](https://en.wikipedia.org/wiki/PL/0) page on Wikipedia to test the lexer and the parser with them. These are the "wp" examples.
+When I started this project I took the three examples form the [PL/0](https://en.wikipedia.org/wiki/PL/0) page on Wikipedia to test the lexer and the parser with them.
 
 ``` Pascal
 // Square
@@ -128,7 +128,7 @@ begin
 end.
 ```
 
-Halfway through the project I found this [PL/0 User Manual](https://github.com/addiedx44/pl0-compiler/blob/master/doc/PL0%20User's%20Manual.pdf) by Adam Dunson, with another three good examples. These are the "ad" examples.
+Halfway through the project I found this [PL/0 User Manual](https://github.com/addiedx44/pl0-compiler/blob/master/doc/PL0%20User's%20Manual.pdf) by Adam Dunson, with another three good examples.
 
 The [grammar](../docs/PL-0%20Grammar.txt) I used in this implementation is almost exactly the grammar provided in the Wikipedia page for PL/0, save for replacing "?" and "!" with "read" and "write".
 
