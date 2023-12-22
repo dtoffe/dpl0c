@@ -9,30 +9,29 @@
 // - Use "var" to declare variables, instead of "int".
 
 // Const DIV renamed to DIVI because DIV is a reserved word in Pascal
-const ADD = 1, SUB = 2, MULT = 3, DIVI = 4;
+const opADD = 1, opSUB = 2, opMULT = 3, opDIV = 4;
 
 var op, x, y, done;
 
-procedure add;
+procedure doAdd;
 begin
     x := x + y;
     write x
 end;
 
-procedure sub;
+procedure doSub;
 begin
     x := x - y;
     write x
 end;
 
-procedure mult;
+procedure doMult;
 begin
     x := x * y;
     write x
 end;
 
-// Procedure div renamed to divi because div is a reserved word in Pascal
-procedure divi;
+procedure doDiv;
 begin
     // Check for divide-by-zero errors
     if y # 0 then
@@ -57,14 +56,14 @@ begin
         if done = 0 then
         begin
             read y;
-            if op = ADD then
-                call add;
-            if op = SUB then
-                call sub;
-            if op = MULT then
-                call mult;
-            if op = DIVI then
-                call divi
+            if op = opADD then
+                call doAdd;
+            if op = opSUB then
+                call doSub;
+            if op = opMULT then
+                call doMult;
+            if op = opDIV then
+                call doDiv
             //else done := 1;
         end
     end

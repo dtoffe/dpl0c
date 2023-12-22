@@ -1,58 +1,57 @@
 program nested;
 
-    const
-        ADD = 1,
-        SUB = 2,
-        MULT = 3,
-        DIV = 4;
+    const opADD = 1;
+    const opSUB = 2;
+    const opMULT = 3;
+    const opDIV = 4;
 
     var
         op,
         x,
         y,
-        done;
+        done : integer;
 
     procedure calculate();
 
-        procedure add();
+        procedure doAdd();
 
         begin
             x := x + y
         end;
 
-        procedure sub();
+        procedure doSub();
 
         begin
             x := x - y
         end;
 
-        procedure mult();
+        procedure doMult();
 
             var
-                c;
+                c : integer;
 
         begin
             x := x * y
         end;
 
-        procedure div();
+        procedure doDiv();
 
         begin
             if y <> 0 then
-                x := x / y;
+                x := x div y;
             if y = 0 then
                 done := 1
         end;
 
     begin
-        if op = ADD then
-            add();
-        if op = SUB then
-            sub();
-        if op = MULT then
-            mult();
-        if op = DIV then
-            div();
+        if op = opADD then
+            doAdd();
+        if op = opSUB then
+            doSub();
+        if op = opMULT then
+            doMult();
+        if op = opDIV then
+            doDiv();
         if done = 0 then
             writeln(x)
     end;

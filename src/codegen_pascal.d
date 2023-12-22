@@ -62,14 +62,12 @@ class PascalCodeGenerator : AstVisitor {
     void visit(BlockNode node) {
         indent();
         if (node.getConstDecls().length > 0) {
-            printIndent();
-            emit("const\n");
-            indent();
             foreach (index, constant; node.getConstDecls()) {
+                printIndent();
+                emit("const ");
                 constant.accept(this);
                 emit(";\n");
             }
-            unindent();
             emit("\n");
         }
         if (node.getVarDecls().length > 0) {
@@ -109,7 +107,6 @@ class PascalCodeGenerator : AstVisitor {
         Symbol* foundSymbol;
         string symbolName = node.getConstName();
         if ((foundSymbol = lookupSymbol(symbolName)) != null) {
-            printIndent();
             emit(symbolName ~ " = " ~ to!string(node.getConstValue()));
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~

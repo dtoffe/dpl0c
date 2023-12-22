@@ -8,29 +8,29 @@
 // - Use "#" instead of "<>" for not-equal.
 // - Use "var" to declare variables, instead of "int".
 
-const ADD = 1, SUB = 2, MULT = 3, DIV = 4;
+const opADD = 1, opSUB = 2, opMULT = 3, opDIV = 4;
 
 var op, x, y, done;
 
 procedure calculate;
 
-    procedure add;
+    procedure doAdd;
     begin
         x := x + y
     end;
 
-    procedure sub;
+    procedure doSub;
     begin
         x := x - y
     end;
 
-    procedure mult;
+    procedure doMult;
     var c;
     begin
         x := x * y
     end;
 
-    procedure div;
+    procedure doDiv;
     begin
         // check for divide-by-zero errors
         if y # 0 then
@@ -40,14 +40,14 @@ procedure calculate;
     end;
 
 begin
-    if op = ADD then
-        call add;
-    if op = SUB then
-        call sub;
-    if op = MULT then
-        call mult;
-    if op = DIV then
-        call div;
+    if op = opADD then
+        call doAdd;
+    if op = opSUB then
+        call doSub;
+    if op = opMULT then
+        call doMult;
+    if op = opDIV then
+        call doDiv;
     if done = 0 then
         write x
 end;

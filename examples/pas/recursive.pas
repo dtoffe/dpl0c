@@ -2,12 +2,12 @@ program recursive;
 
     var
         f,
-        n;
+        n : integer;
 
     procedure fact();
 
         var
-            ans1;
+            ans1 : integer;
 
     begin
         ans1 := n;

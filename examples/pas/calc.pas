@@ -1,10 +1,9 @@
 program calc;
 
-    const
-        ADD = 1;
-        SUB = 2;
-        MULT = 3;
-        DIVI = 4;
+    const opADD = 1;
+    const opSUB = 2;
+    const opMULT = 3;
+    const opDIV = 4;
 
     var
         op,
@@ -12,28 +11,28 @@ program calc;
         y,
         done : integer;
 
-    procedure add();
+    procedure doAdd();
 
     begin
         x := x + y;
         writeln(x)
     end;
 
-    procedure sub();
+    procedure doSub();
 
     begin
         x := x - y;
         writeln(x)
     end;
 
-    procedure mult();
+    procedure doMult();
 
     begin
         x := x * y;
         writeln(x)
     end;
 
-    procedure divi();
+    procedure doDiv();
 
     begin
         if y <> 0 then
@@ -58,14 +57,14 @@ begin
             if done = 0 then
                 begin
                     readln(y);
-                    if op = ADD then
-                        add();
-                    if op = SUB then
-                        sub();
-                    if op = MULT then
-                        mult();
-                    if op = DIVI then
-                        divi()
+                    if op = opADD then
+                        doAdd();
+                    if op = opSUB then
+                        doSub();
+                    if op = opMULT then
+                        doMult();
+                    if op = opDIV then
+                        doDiv()
                 end
         end
 end.
