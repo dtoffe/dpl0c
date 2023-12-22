@@ -17,7 +17,7 @@ program primes;
         i := 2;
         while i < arg do
             begin
-                if arg / i * i = arg then
+                if arg div i * i = arg then
                     begin
                         ret := 0;
                         i := arg
@@ -39,4 +39,7 @@ program primes;
             end
     end;
 
-primes().
+begin
+    primes()
+end
+.

@@ -1,16 +1,16 @@
 program calc;
 
     const
-        ADD = 1,
-        SUB = 2,
-        MULT = 3,
-        DIV = 4;
+        ADD = 1;
+        SUB = 2;
+        MULT = 3;
+        DIVI = 4;
 
     var
         op,
         x,
         y,
-        done;
+        done : integer;
 
     procedure add();
 
@@ -33,12 +33,12 @@ program calc;
         writeln(x)
     end;
 
-    procedure div();
+    procedure divi();
 
     begin
         if y <> 0 then
             begin
-                x := x / y;
+                x := x div y;
                 writeln(x)
             end;
         if y = 0 then
@@ -64,8 +64,8 @@ begin
                         sub();
                     if op = MULT then
                         mult();
-                    if op = DIV then
-                        div()
+                    if op = DIVI then
+                        divi()
                 end
         end
 end.

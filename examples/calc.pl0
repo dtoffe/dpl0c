@@ -8,7 +8,8 @@
 // - Use "#" instead of "<>" for not-equal.
 // - Use "var" to declare variables, instead of "int".
 
-const ADD = 1, SUB = 2, MULT = 3, DIV = 4;
+// Const DIV renamed to DIVI because DIV is a reserved word in Pascal
+const ADD = 1, SUB = 2, MULT = 3, DIVI = 4;
 
 var op, x, y, done;
 
@@ -30,7 +31,8 @@ begin
     write x
 end;
 
-procedure div;
+// Procedure div renamed to divi because div is a reserved word in Pascal
+procedure divi;
 begin
     // Check for divide-by-zero errors
     if y # 0 then
@@ -61,8 +63,8 @@ begin
                 call sub;
             if op = MULT then
                 call mult;
-            if op = DIV then
-                call div
+            if op = DIVI then
+                call divi
             //else done := 1;
         end
     end

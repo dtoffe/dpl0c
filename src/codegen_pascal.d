@@ -4,7 +4,6 @@
  */
 module codegen_pascal;
 
-import llvm;
 import std.conv;
 import std.range;
 import std.stdio;
@@ -42,7 +41,7 @@ class PascalCodeGenerator : AstVisitor {
 
     void visit(ProgramNode node) {
         writeln();
-        writeln("Generating code for program ", name, " :");
+        writeln("Generating Pascal code for program ", name, " :");
 
         emit("\n");
         emit("\n");
@@ -68,11 +67,7 @@ class PascalCodeGenerator : AstVisitor {
             indent();
             foreach (index, constant; node.getConstDecls()) {
                 constant.accept(this);
-                if (index + 1 < node.getConstDecls().length) {
-                    emit(",\n");
-                } else {
-                    emit(";\n");
-                }
+                emit(";\n");
             }
             unindent();
             emit("\n");
@@ -86,7 +81,7 @@ class PascalCodeGenerator : AstVisitor {
                 if (index + 1 < node.getVarDecls().length) {
                     emit(",\n");
                 } else {
-                    emit(";\n");
+                    emit(" : integer;\n");
                 }
             }
             unindent();
@@ -96,7 +91,18 @@ class PascalCodeGenerator : AstVisitor {
             procedure.accept(this);
         }
         unindent();
+        if (typeid(node.statement) != typeid(BeginEndNode)) {
+            printIndent();
+            emit("begin\n");
+            indent();
+        }
         node.statement.accept(this);
+        if (typeid(node.statement) != typeid(BeginEndNode)) {
+            emit("\n");
+            unindent();
+            printIndent();
+            emit("end\n");
+        }
     }
 
     void visit(ConstDeclNode node) {
@@ -278,7 +284,7 @@ class PascalCodeGenerator : AstVisitor {
                     emit(" * ");
                     break;
                 case TokenType.DIV:
-                    emit(" / ");
+                    emit(" div ");
                     break;
                 default:
                     break;
