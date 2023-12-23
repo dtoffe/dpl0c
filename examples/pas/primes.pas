@@ -1,7 +1,6 @@
 program primes;
 
-    const
-        max = 100;
+    const max = 100;
 
     var
         arg,

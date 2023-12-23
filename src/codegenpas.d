@@ -43,8 +43,6 @@ class PascalCodeGenerator : AstVisitor {
         writeln();
         writeln("Generating Pascal code for program ", name, " :");
 
-        emit("\n");
-        emit("\n");
         string result = name[11..name.indexOf(".", 2)];
         emit("program " ~ result ~ ";\n");
         emit("\n");
@@ -56,7 +54,10 @@ class PascalCodeGenerator : AstVisitor {
         emit(".\n");
 
         // Write source to file
-        write(name ~ ".pas", sourceFileText);
+        //write(name ~ ".pas", sourceFileText);
+        File file = File("./examples/pas/" ~ result ~ ".pas", "w");
+        file.write(sourceFileText);
+        file.close();
     }
 
     void visit(BlockNode node) {
