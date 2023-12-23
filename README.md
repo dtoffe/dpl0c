@@ -52,11 +52,14 @@ The compiler is written in D and features:
 - AST traversal implemented with a Visitor pattern.
   - :heavy_check_mark: A prettyprinter visitor.
   - :warning: A symbol table builder and semantic checking visitor.
-  - :construction: A handful of visitors for the code generation backend.
+  - A handful of visitors for the code generation backend (see details below).
 - Code generators:
-  - :construction: A transpiling code generator which emits Pascal source code. (Granted, reading PL/0 and emitting Pascal should count as cheating).
-  - :construction: An [LLVM IR](https://llvm.org/) code generator (almost finished).
-  - :interrobang: A transpiling code generator which emits C source code. (Other languages do this, so probably not cheating, or cheating not so much).
+  - :heavy_check_mark: A transpiling code generator which emits Pascal source code. (Granted, reading PL/0 and emitting Pascal should count as cheating).
+    - The main examples are tested and run OK.
+  - :construction: A transpiling code generator which emits C source code. (Other languages do this, so probably not cheating, or cheating not so much).
+    - Just started working on it.
+  - :construction: An [LLVM IR](https://llvm.org/) code generator.
+    - Is almost finished, but still workin on proper nesting of scopes.
   - :interrobang: A [QBE](https://c9x.me/compile/) code generator.
   - :interrobang: Maybe I consider adding a CLR bytecode generator and a JVM bytecode generator in the future, just for learning purposes.
 - :construction: Runtime library in C for the implementation of "read" and "write".
@@ -66,6 +69,12 @@ There is no plan for adding features to the language, as commonly done in the co
 I'm yet undecided about adding optimization passes.
 
 I would love, however, adding error recovery to the parser, for example via symbol insertion of missing semicolons. But I've still got to figure out how to do it.
+
+## Setup
+
+For D language development I used the [DMD compiler](https://dlang.org/download.html) and the [Digital Mars free C++ compiler](https://www.digitalmars.com/download/freecompiler.html). I'm using VSCode with the D Programming Language (code-d) extension from the VSCode Marketplace. The project is [dub](https://code.dlang.org/) based.
+
+To run the Pascal generated sources I used the [Free Pascal compiler](https://www.freepascal.org/).
 
 ## Examples
 
