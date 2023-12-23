@@ -2,7 +2,7 @@
  * Copyright (c) 2023 Alejandro Daniel Toffetti
  * You can find the complete text of the license in the file LICENSE at the root of this project.
  */
-module codegen_llvm;
+module codegenllvm;
 
 import llvm;
 import std.conv;
