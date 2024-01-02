@@ -388,7 +388,7 @@ class Parser {
         FactorNode factorNode;
         switch (currentToken.getTokenType()) {
             case TokenType.IDENT:
-                factorNode = new VariableNode(currentToken.getLiteral());
+                factorNode = new IdentNode(currentToken.getLiteral());
                 currentToken = lexer.nextToken();
                 break;
             case TokenType.NUMBER:

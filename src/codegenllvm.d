@@ -405,9 +405,9 @@ class LLVMCodeGenerator : AstVisitor {
         node.setLlvmValue(numberRef);
     }
 
-    void visit(VariableNode node) {
+    void visit(IdentNode node) {
         Symbol* foundSymbol;
-        string symbolName = node.getVarName();
+        string symbolName = node.getIdentName();
         LLVMValueRef variableRef;
         if ((foundSymbol = lookupSymbol(symbolName)) != null) {
             variableRef = LLVMBuildLoad(llvmBuilder, symbols[node.getSymbolId()].getValueRef(), symbolName.toStringz());

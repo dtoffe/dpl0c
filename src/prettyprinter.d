@@ -248,8 +248,8 @@ class PrettyPrinter : AstVisitor {
         write(node.getValue());
     }
 
-    void visit(VariableNode node) {
-        write(node.getVarName());
+    void visit(IdentNode node) {
+        write(node.getIdentName());
     }
 
     void visit(ParenExpNode node) {

@@ -502,17 +502,17 @@ class NumberNode : FactorNode {
 
 }
 
-class VariableNode : FactorNode {
+class IdentNode : FactorNode {
     
-    string varName;
+    string identName;
     int symbolId;
 
-    this(string varName) {
-        this.varName = varName;
+    this(string identName) {
+        this.identName = identName;
     }
 
-    string getVarName() {
-        return varName;
+    string getIdentName() {
+        return identName;
     }
 
     int getSymbolId() {
@@ -569,7 +569,7 @@ interface AstVisitor {
     void visit(TermNode node);
     //void visit(FactorNode node); // abstract
     void visit(NumberNode node);
-    void visit(VariableNode node);
+    void visit(IdentNode node);
     void visit(ParenExpNode node);
 
 }

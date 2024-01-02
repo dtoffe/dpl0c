@@ -297,8 +297,8 @@ class PascalCodeGenerator : AstVisitor {
         emit(node.getValue());
     }
 
-    void visit(VariableNode node) {
-        emit(node.getVarName());
+    void visit(IdentNode node) {
+        emit(node.getIdentName());
     }
 
     void visit(ParenExpNode node) {

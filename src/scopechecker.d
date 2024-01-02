@@ -204,9 +204,9 @@ class ScopeChecker : AstVisitor {
 
     }
 
-    void visit(VariableNode node) {
+    void visit(IdentNode node) {
         Symbol* foundSymbol;
-        string symbolName = node.getVarName();
+        string symbolName = node.getIdentName();
         if ((foundSymbol = lookupSymbol(symbolName)) != null) {
             if (foundSymbol.kind == SymbolKind.PROCEDURE) {
                 ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Procedure '" ~
