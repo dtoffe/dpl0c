@@ -59,7 +59,7 @@ The compiler is written in D and features:
   - :construction: A transpiling code generator which emits C source code. (Other languages do this, so probably not cheating, or cheating not so much).
     - Just started working on it.
   - :construction: An [LLVM IR](https://llvm.org/) code generator.
-    - Is almost finished, but still workin on proper nesting of scopes.
+    - It's almost finished, but still working on proper nesting of scopes.
   - :interrobang: A [QBE](https://c9x.me/compile/) code generator.
   - :interrobang: Maybe I consider adding a CLR bytecode generator and a JVM bytecode generator in the future, just for learning purposes.
 - :construction: Runtime library in C for the implementation of "read" and "write".
