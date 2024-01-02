@@ -9,8 +9,40 @@ import std.stdio;
 import ast;
 import error;
 import lexer;
-import symtable;
 import token;
+
+/*
+    Note: Consider the pros and cons of adopting the idioms in the following code.
+    This is widely used in the compilers literature and it is likely that
+    using this style enhances readability, extensibility and modifiability
+    of the parser code.
+
+    See also: expect(tokenType)
+
+    Token match(TokenKind kind) {
+        if (currentToken.kind == kind) {
+            Token token = currentToken;
+            currentToken = lexer.getNextToken();
+            return token;
+        } else {
+            // Error handling
+        }
+    }
+
+    void eat(TokenKind kind) {
+        if (currentToken.kind == kind) {
+            currentToken = lexer.getNextToken();
+        } else {
+            // Error handling
+        }
+    }
+
+    Note 2: In the book Algorithms + Data Structures = Programs, N. Wirth
+    presents PL/0, shows how to code a lexer and parser, and then explains
+    a technique to add error recovery to the parser by adding or deleting
+    one symbol whenever a production can not be parsed.
+    Consider adding that technique here.
+*/
 
 class Parser {
 
@@ -414,29 +446,3 @@ class Parser {
     }
 
 }
-
-/*
-    Consider the pros and cons of adopting the idioms in the following code.
-    This is widely used in the compilers literature and it is likely that
-    using this style enhances readability, extensibility and modifiability
-    of the parser code.
-
-    Token match(TokenKind kind) {
-        if (currentToken.kind == kind) {
-            Token token = currentToken;
-            currentToken = lexer.getNextToken();
-            return token;
-        } else {
-            // Error handling
-        }
-    }
-
-    void eat(TokenKind kind) {
-        if (currentToken.kind == kind) {
-            currentToken = lexer.getNextToken();
-        } else {
-            // Error handling
-        }
-    }
-
-*/
