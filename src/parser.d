@@ -141,7 +141,8 @@ class Parser {
         int i = 0;
         while (currentToken.getTokenType() == TokenType.IDENT) {
             name = currentToken.getLiteral();
-            VarDeclNode decl = new VarDeclNode(name);
+            IdentNode ident = new IdentNode(name);
+            VarDeclNode decl = new VarDeclNode(ident);
             varDecls ~= decl;
             currentToken = lexer.nextToken();
             if (currentToken.getTokenType() == TokenType.SEMICOLON) {

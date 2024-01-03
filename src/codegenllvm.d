@@ -156,7 +156,7 @@ class LLVMCodeGenerator : AstVisitor {
 
     void visit(VarDeclNode node) {
         Symbol* foundSymbol;
-        string symbolName = node.getVarName();
+        string symbolName = node.getIdent().getName();
         LLVMValueRef valRef;
         LLVMValueRef varValue;
         if ((foundSymbol = lookupSymbol(symbolName)) != null) {
@@ -164,7 +164,7 @@ class LLVMCodeGenerator : AstVisitor {
             // All vars are initialized to 0 on declaration
             varValue = LLVMConstInt(int32Type, 0, false);
             LLVMBuildStore(llvmBuilder, varValue, valRef);
-            symbols[node.getSymbolId()].setValueRef(valRef);
+            symbols[node.getIdent().getSymbolId()].setValueRef(valRef);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
                     not found in scope: '" ~ (*foundSymbol).scopeName ~ "'.");

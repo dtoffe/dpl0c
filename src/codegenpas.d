@@ -117,7 +117,7 @@ class PascalCodeGenerator : AstVisitor {
 
     void visit(VarDeclNode node) {
         Symbol* foundSymbol;
-        string symbolName = node.getVarName();
+        string symbolName = node.getIdent().getName();
         if ((foundSymbol = lookupSymbol(symbolName)) != null) {
             printIndent();
             emit(symbolName);

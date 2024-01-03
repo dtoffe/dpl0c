@@ -62,11 +62,12 @@ class ScopeChecker : AstVisitor {
     }
 
     void visit(VarDeclNode node) {
-        symtable.createSymbol(node.getVarName(), SymbolKind.VAR, SymbolType.INTEGER, 0);
+        string name = node.getIdent().getName();
+        symtable.createSymbol(name, SymbolKind.VAR, SymbolType.INTEGER, 0);
         Symbol* foundSymbol;
-        string symbolName = node.getVarName();
+        string symbolName = name;
         if ((foundSymbol = lookupSymbol(symbolName)) != null) {
-            node.setSymbolId((*foundSymbol).id);
+            node.getIdent().setSymbolId((*foundSymbol).id);
         }
     }
 

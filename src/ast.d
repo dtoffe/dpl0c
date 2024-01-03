@@ -86,7 +86,6 @@ class ConstDeclNode : AstNode {
 
     IdentNode ident;
     NumberNode number;
-    int symbolId;
 
     this(IdentNode ident, NumberNode number) {
         this.ident = ident;
@@ -109,23 +108,14 @@ class ConstDeclNode : AstNode {
 
 class VarDeclNode : AstNode {
 
-    string varName;
-    int symbolId;
- 
-    this(string varName) {
-        this.varName = varName;
-    }
-    
-    string getVarName() {
-        return varName;
-    }
-    
-    int getSymbolId() {
-        return symbolId;
-    }
+    IdentNode ident;
 
-    void setSymbolId(int symbolId) {
-        this.symbolId = symbolId;
+    this(IdentNode ident) {
+        this.ident = ident;
+    }
+    
+    IdentNode getIdent() {
+        return ident;
     }
 
     override void accept(AstVisitor visitor) {

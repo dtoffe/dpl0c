@@ -85,7 +85,7 @@ class PrettyPrinter : AstVisitor {
 
     void visit(VarDeclNode node) {
         printIndent();
-        write(node.getVarName());
+        write(node.getIdent().getName());
     }
 
     void visit(ProcDeclNode node) {
