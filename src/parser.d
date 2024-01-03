@@ -93,7 +93,7 @@ class Parser {
     ConstDeclNode[] parseConstDecls() {
         ConstDeclNode[] constDecls;
         string name = "";
-        int value = 0;
+        string value = "";
         int i = 0;
         bool error = false;
         while (currentToken.getTokenType() == TokenType.IDENT) {
@@ -107,7 +107,7 @@ class Parser {
             }
             currentToken = lexer.nextToken();
             if (currentToken.getTokenType() == TokenType.NUMBER) {
-                value = to!int(currentToken.getLiteral());
+                value = currentToken.getLiteral();
             } else {
                 ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.NUMBER) ~
                     " expected, but found " ~ to!string(currentToken.getTokenType()) ~ " in parseConstDecls",
@@ -115,7 +115,9 @@ class Parser {
                 error = true;
             }
             if (!error) {
-                ConstDeclNode decl = new ConstDeclNode(name, value);
+                IdentNode ident = new IdentNode(name);
+                NumberNode number = new NumberNode(value);
+                ConstDeclNode decl = new ConstDeclNode(ident, number);
                 constDecls ~= decl;
             }
             error = false;

@@ -11,11 +11,11 @@ import token;
 
 class PrettyPrinter : AstVisitor {
 
-    string name;
+    string moduleName;
     private int indentLevel = 0;
 
-    this(string name) {
-        this.name = name;
+    this(string moduleName) {
+        this.moduleName = moduleName;
     }
 
     private void indent() {
@@ -31,7 +31,7 @@ class PrettyPrinter : AstVisitor {
     }
 
     void visit(ProgramNode node) {
-        writeln("Prettyprinting program ", name, " :");
+        writeln("Prettyprinting program ", moduleName, " :");
         node.getBlock.accept(this);
         writeln(".");
         writeln("");
@@ -80,7 +80,7 @@ class PrettyPrinter : AstVisitor {
 
     void visit(ConstDeclNode node) {
         printIndent();
-        write(node.getConstName(), " = ", node.getConstValue());
+        write(node.getIdent().getName, " = ", node.getNumber().getValue());
     }
 
     void visit(VarDeclNode node) {
@@ -249,7 +249,7 @@ class PrettyPrinter : AstVisitor {
     }
 
     void visit(IdentNode node) {
-        write(node.getIdentName());
+        write(node.getName());
     }
 
     void visit(ParenExpNode node) {

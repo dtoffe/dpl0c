@@ -24,10 +24,10 @@ import symtable;
  */
 class ScopeChecker : AstVisitor {
 
-    string name;
+    string moduleName;
 
-    this(string name) {
-        this.name = name;
+    this(string moduleName) {
+        this.moduleName = moduleName;
     }
 
     void visit(ProgramNode node) {
@@ -51,11 +51,13 @@ class ScopeChecker : AstVisitor {
     }
 
     void visit(ConstDeclNode node) {
-        symtable.createSymbol(node.getConstName(), SymbolKind.CONST, SymbolType.INTEGER, node.getConstValue());
+        string name = node.getIdent().getName();
+        int value = node.getNumber().getNumberValue();
+        symtable.createSymbol(name, SymbolKind.CONST, SymbolType.INTEGER, value);
         Symbol* foundSymbol;
-        string symbolName = node.getConstName();
+        string symbolName = node.getIdent().getName();
         if ((foundSymbol = lookupSymbol(symbolName)) != null) {
-            node.setSymbolId((*foundSymbol).id);
+            node.getIdent().setSymbolId((*foundSymbol).id);
         }
     }
 
@@ -206,7 +208,7 @@ class ScopeChecker : AstVisitor {
 
     void visit(IdentNode node) {
         Symbol* foundSymbol;
-        string symbolName = node.getIdentName();
+        string symbolName = node.getName();
         if ((foundSymbol = lookupSymbol(symbolName)) != null) {
             if (foundSymbol.kind == SymbolKind.PROCEDURE) {
                 ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Procedure '" ~

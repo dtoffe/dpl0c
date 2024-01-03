@@ -84,29 +84,21 @@ class BlockNode : AstNode {
 
 class ConstDeclNode : AstNode {
 
-    string constName;
-    int constValue;
+    IdentNode ident;
+    NumberNode number;
     int symbolId;
 
-    this(string constName, int constValue) {
-        this.constName = constName;
-        this.constValue = constValue;
+    this(IdentNode ident, NumberNode number) {
+        this.ident = ident;
+        this.number = number;
     }
     
-    string getConstName() {
-        return constName;
+    IdentNode getIdent() {
+        return ident;
     }
 
-    int getConstValue() {
-        return constValue;
-    }
-
-    int getSymbolId() {
-        return symbolId;
-    }
-
-    void setSymbolId(int symbolId) {
-        this.symbolId = symbolId;
+    NumberNode getNumber() {
+        return number;
     }
 
     override void accept(AstVisitor visitor) {
@@ -504,15 +496,15 @@ class NumberNode : FactorNode {
 
 class IdentNode : FactorNode {
     
-    string identName;
+    string name;
     int symbolId;
 
-    this(string identName) {
-        this.identName = identName;
+    this(string name) {
+        this.name = name;
     }
 
-    string getIdentName() {
-        return identName;
+    string getName() {
+        return name;
     }
 
     int getSymbolId() {

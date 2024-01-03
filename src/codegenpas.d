@@ -106,9 +106,9 @@ class PascalCodeGenerator : AstVisitor {
 
     void visit(ConstDeclNode node) {
         Symbol* foundSymbol;
-        string symbolName = node.getConstName();
+        string symbolName = node.getIdent().getName();
         if ((foundSymbol = lookupSymbol(symbolName)) != null) {
-            emit(symbolName ~ " = " ~ to!string(node.getConstValue()));
+            emit(symbolName ~ " = " ~ to!string(node.getNumber().getValue()));
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
                     not found in scope: '" ~ (*foundSymbol).scopeName ~ "'.");
@@ -298,7 +298,7 @@ class PascalCodeGenerator : AstVisitor {
     }
 
     void visit(IdentNode node) {
-        emit(node.getIdentName());
+        emit(node.getName());
     }
 
     void visit(ParenExpNode node) {
