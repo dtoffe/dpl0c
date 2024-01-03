@@ -15,7 +15,7 @@ import token;
 
 class LLVMCodeGenerator : AstVisitor {
 
-    string name;
+    string moduleName;
     bool emitDebugInfo;
 
     LLVMTypeRef int32Type;
@@ -28,8 +28,8 @@ class LLVMCodeGenerator : AstVisitor {
     LLVMBasicBlockRef currentBasicBlock;
     LLVMTargetMachineRef llvmTargetMachine;
 
-    this(string name, bool emitDebugInfo = false) {
-        this.name = name;
+    this(string moduleName, bool emitDebugInfo = false) {
+        this.moduleName = moduleName;
         this.emitDebugInfo = emitDebugInfo;
     }
 
@@ -39,7 +39,7 @@ class LLVMCodeGenerator : AstVisitor {
         // Setup LLVM main objects
         int32Type = LLVMInt32Type();
         llvmContext = LLVMGetGlobalContext();
-        llvmModule = LLVMModuleCreateWithNameInContext((name ~ ".ll").toStringz(), llvmContext);
+        llvmModule = LLVMModuleCreateWithNameInContext((moduleName ~ ".ll").toStringz(), llvmContext);
         llvmBuilder = LLVMCreateBuilderInContext(llvmContext);
 
         // Setup default triple
@@ -99,7 +99,7 @@ class LLVMCodeGenerator : AstVisitor {
 
     void visit(ProgramNode node) {
         writeln();
-        writeln("Generating code for program ", name, " :");
+        writeln("Generating code for program ", moduleName, " :");
         initializeLLVM();
         setupExternals();
 
@@ -172,17 +172,18 @@ class LLVMCodeGenerator : AstVisitor {
     }
 
     void visit(ProcDeclNode node) {
+        string name = node.getIdent().getName();
         LLVMBasicBlockRef parentBasicBlock = currentBasicBlock;
         LLVMTypeRef[] procArgs = [];
         LLVMTypeRef procType = LLVMFunctionType(LLVMInt32Type(), procArgs.ptr, cast(uint) procArgs.length, false);
-        LLVMValueRef thisProcedure = LLVMAddFunction(llvmModule, cast(char*)node.getProcName.toStringz(), procType);
+        LLVMValueRef thisProcedure = LLVMAddFunction(llvmModule, cast(char*)name.toStringz(), procType);
         LLVMValueRef parentFunction = currentFunction;
-        string procName = node.getProcName ~ "_main";
-        LLVMBasicBlockRef procBasicBlock = LLVMAppendBasicBlock(thisProcedure, cast(char*)procName.toStringz());
+        name = name ~ "_main";
+        LLVMBasicBlockRef procBasicBlock = LLVMAppendBasicBlock(thisProcedure, cast(char*)name.toStringz());
         currentBasicBlock = procBasicBlock;
         currentFunction = thisProcedure;
         LLVMPositionBuilderAtEnd(llvmBuilder, procBasicBlock);
-        enterScope(node.getProcName());
+        enterScope(name);
         node.getBlock().accept(this);
         exitScope();
         LLVMBuildRet(llvmBuilder, LLVMConstInt(LLVMInt32Type(), 0, true));

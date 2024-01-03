@@ -129,9 +129,9 @@ class PascalCodeGenerator : AstVisitor {
 
     void visit(ProcDeclNode node) {
         printIndent();
-        emit("procedure " ~ node.getProcName ~ "();\n");
+        emit("procedure " ~ node.getIdent().getName() ~ "();\n");
         emit("\n");
-        enterScope(node.getProcName());
+        enterScope(node.getIdent().getName());
         node.getBlock().accept(this);
         exitScope();
         emit(";\n");

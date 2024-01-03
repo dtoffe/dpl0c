@@ -72,13 +72,14 @@ class ScopeChecker : AstVisitor {
     }
 
     void visit(ProcDeclNode node) {
-        symtable.createSymbol(node.getProcName(), SymbolKind.PROCEDURE, SymbolType.INTEGER, 0);
+        string name = node.getIdent().getName();
+        symtable.createSymbol(name, SymbolKind.PROCEDURE, SymbolType.INTEGER, 0);
         Symbol* foundSymbol;
-        string symbolName = node.getProcName();
+        string symbolName = name;
         if ((foundSymbol = lookupSymbol(symbolName)) != null) {
-            node.setSymbolId((*foundSymbol).id);
+            node.getIdent().setSymbolId((*foundSymbol).id);
         }
-        symtable.createScope(node.getProcName());
+        symtable.createScope(name);
         //symtable.enterScope(node.getProcName());
         node.getBlock().accept(this);
         symtable.exitScope();

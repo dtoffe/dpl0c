@@ -126,25 +126,16 @@ class VarDeclNode : AstNode {
 
 class ProcDeclNode : AstNode {
 
-    string procName;
-    int symbolId;
+    IdentNode ident;
     BlockNode block;
 
-    this(string procName, BlockNode block) {
-        this.procName = procName;
+    this(IdentNode ident, BlockNode block) {
+        this.ident = ident;
         this.block = block;
     }
 
-    string getProcName() {
-        return procName;
-    }
-
-    int getSymbolId() {
-        return symbolId;
-    }
-
-    void setSymbolId(int symbolId) {
-        this.symbolId = symbolId;
+    IdentNode getIdent() {
+        return ident;
     }
 
     BlockNode getBlock() {

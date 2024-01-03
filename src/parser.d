@@ -188,7 +188,8 @@ class Parser {
                 currentToken); 
         }
         BlockNode block = parseBlock();
-        procDecl = new ProcDeclNode(procName, block);
+        IdentNode ident = new IdentNode(procName);
+        procDecl = new ProcDeclNode(ident, block);
         if (currentToken.getTokenType() == TokenType.SEMICOLON) {
             currentToken = lexer.nextToken();
         } else {

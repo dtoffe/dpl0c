@@ -90,7 +90,7 @@ class PrettyPrinter : AstVisitor {
 
     void visit(ProcDeclNode node) {
         printIndent();
-        writeln("procedure ", node.getProcName(), ";");
+        writeln("procedure ", node.getIdent().getName(), ";");
         node.getBlock().accept(this);
         writeln(";");
         writeln();
