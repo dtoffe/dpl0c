@@ -43,16 +43,15 @@ Comments start with "//", on its own line or after a statement, and go until the
 The compiler is written in D and features:
 
 - :heavy_check_mark: A hand-coded scanner.
-- :heavy_check_mark: A hand-coded recursive descent parser.
+- :warning: A hand-coded recursive descent parser (currently I'm rewriting part of it to make the code clearer to follow and to introduce error correction or recovery in the future).
   - There is no precedence climbing: since the language is so small, the precedence is handled by the grammar.
   - Conditions are also handled by the grammar, so there is no need for a boolean datatype.
 - :heavy_check_mark: Abstract syntax tree created by the parser.
-- :warning: A symbol table used to keep track of variables and their scopes, built by the semantic checking visitor and used by the code generation visitor.
-- :information_source: (Note: currently I'm reworking the symbol table and evaluating possible links with the AST.)
+- :warning: A symbol table used to keep track of variables and their scopes, built by the semantic checking visitor and used by the code generation visitors (I'm about to modify it to allow for symbol aliasing or renaming, needed for some code generators, in fact, maybe all but the Pascal code generator).
 - AST traversal implemented with a Visitor pattern.
   - :heavy_check_mark: A prettyprinter visitor.
-  - :warning: A symbol table builder and semantic checking visitor.
-  - A handful of visitors for the code generation backend (see details below).
+  - :heavy_check_mark: A symbol table builder and semantic checking visitor.
+  - :construction: A handful of visitors for the code generation backend (see details below).
 - Code generators:
   - :heavy_check_mark: A transpiling code generator which emits Pascal source code. (Granted, reading PL/0 and emitting Pascal should count as cheating).
     - The main examples are tested and run OK.
@@ -61,8 +60,9 @@ The compiler is written in D and features:
   - :construction: An [LLVM IR](https://llvm.org/) code generator.
     - It's almost finished, but still working on proper nesting of scopes.
   - :interrobang: A [QBE](https://c9x.me/compile/) code generator.
-  - :interrobang: Maybe I consider adding a CLR bytecode generator and a JVM bytecode generator in the future, just for learning purposes.
-- :construction: Runtime library in C for the implementation of "read" and "write".
+  - :interrobang: A CLR (.NET) bytecode generator ?
+  - :interrobang: A JVM (Java) bytecode generator ?
+- :construction: Runtime library in C for the implementation of "read" and "write" (Needed for the LLVM and the QBE code generators).
 
 There is no plan for adding features to the language, as commonly done in the compiler courses where PL/0 is used as target language.
 
