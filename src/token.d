@@ -53,7 +53,12 @@ enum TokenType {
 
 	// Identifiers and numeric constants
 	IDENT,
-	NUMBER
+	NUMBER,
+
+    // Group markers for consume method in parser
+    RELOP,      // Any relational operator
+    TERMOP,     // PLUS and MINUS
+    FACTOP      // MULT and DIV
 
 }
 
@@ -119,4 +124,24 @@ TokenType lookUpIdent(string ident) {
 string toString(Token token) {
     return "TokenType: " ~ to!string(token.tokenType) ~ " at line: " ~ to!string(token.getLine()) ~
                 " column: " ~ to!string(token.getColumn()) ~ " lexeme: " ~ token.getLiteral();
+}
+
+TokenType tokenGroup(TokenType tokenType) {
+    switch (tokenType) {
+        case TokenType.EQUAL:
+        case TokenType.NOTEQUAL:
+        case TokenType.LESSER:
+        case TokenType.LESSEREQ:
+        case TokenType.GREATER:
+        case TokenType.GREATEREQ:
+            return TokenType.RELOP;
+        case TokenType.PLUS:
+        case TokenType.MINUS:
+            return TokenType.TERMOP;
+        case TokenType.MULT:
+        case TokenType.DIV:
+            return TokenType.FACTOP;
+        default:
+            return tokenType;
+    }
 }
