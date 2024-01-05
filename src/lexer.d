@@ -24,10 +24,6 @@ class Lexer {
         column = 0;
     }
 
-    void sayHello() {
-        writeln(sourceLines[0]);
-    }
-
     void readChar() {
         if (line >= sourceLines.length) {
             currentChar = ControlChar.nul;
