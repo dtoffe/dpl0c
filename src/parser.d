@@ -71,9 +71,9 @@ class Parser {
 
     ProgramNode parseProgram() {
         ProgramNode program = new ProgramNode();
+        // Get the first token from the input so lookahead() does not return null
         currentToken = lexer.nextToken();
-        BlockNode block = parseBlock();
-        program.block = block;
+        program.block = parseBlock();
         consume(TokenType.PERIOD);
         consume(TokenType.EOF);
         return program;
