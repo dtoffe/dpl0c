@@ -63,6 +63,7 @@ The compiler is written in D and features:
   - :interrobang: A CLR (.NET) bytecode generator ?
   - :interrobang: A JVM (Java) bytecode generator ?
 - :construction: Runtime library in C for the implementation of "read" and "write" (Needed for the LLVM and the QBE code generators).
+- :interrobang: Alternative lexer and parser following the Roslyn design principles (compiler as a service), complete with a language server.
 - :star: If the stars get properly aligned and I finally start my personal/developer blog, maybe a tutorial !!!
 
 There is no plan for adding features to the language, as commonly done in the compiler courses where PL/0 is used as target language.
