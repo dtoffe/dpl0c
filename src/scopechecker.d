@@ -92,7 +92,7 @@ class ScopeChecker : AstVisitor {
 
     void visit(AssignNode node) {
         Symbol* foundSymbol;
-        string symbolName = node.getIdentName();
+        string symbolName = node.getIdent().getName();
         if ((foundSymbol = lookupSymbol(symbolName)) != null) {
             if ((*foundSymbol).kind == SymbolKind.CONST) {
                 ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Constant '" ~
@@ -103,7 +103,7 @@ class ScopeChecker : AstVisitor {
                         symbolName ~ "' cannot be assigned a value.");
             }
             writeln("Assign to variable: " ~ symbolName ~ " in scope: " ~ (*foundSymbol).scopeName);
-            node.setSymbolId((*foundSymbol).id);
+            node.getIdent().setSymbolId((*foundSymbol).id);
         } else {
             ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
                     symbolName ~ "' is undeclared in the current and all enclosing scopes.");
@@ -113,7 +113,7 @@ class ScopeChecker : AstVisitor {
 
     void visit(CallNode node) {
         Symbol* foundSymbol;
-        string symbolName = node.getIdentName();
+        string symbolName = node.getIdent().getName();
         if ( (foundSymbol = lookupSymbol(symbolName) ) != null) {
             if ((*foundSymbol).kind == SymbolKind.CONST) {
                 ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Constant '" ~
@@ -124,7 +124,7 @@ class ScopeChecker : AstVisitor {
                         symbolName ~ "' cannot be called.");
             }
             writeln("Call to procedure: " ~ symbolName ~ " in scope: " ~ (*foundSymbol).scopeName);
-            node.setSymbolId((*foundSymbol).id);
+            node.getIdent().setSymbolId((*foundSymbol).id);
         } else {
             ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
                     symbolName ~ "' is undeclared in the current and all enclosing scopes.");
@@ -133,7 +133,7 @@ class ScopeChecker : AstVisitor {
 
     void visit(ReadNode node) {
         Symbol* foundSymbol;
-        string symbolName = node.getVarName();
+        string symbolName = node.getIdent().getName();
         if ((foundSymbol = lookupSymbol(symbolName)) != null) {
             if ((*foundSymbol).kind == SymbolKind.CONST) {
                 ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Constant '" ~
@@ -144,7 +144,7 @@ class ScopeChecker : AstVisitor {
                         symbolName ~ "' cannot be read into.");
             }
             writeln("Read into variable: " ~ symbolName ~ " in scope: " ~ (*foundSymbol).scopeName);
-            node.setSymbolId((*foundSymbol).id);
+            node.getIdent().setSymbolId((*foundSymbol).id);
         } else {
             ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
                     symbolName ~ "' is undeclared in the current and all enclosing scopes.");

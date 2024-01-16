@@ -218,21 +218,25 @@ class Parser {
 
     AssignNode parseAssign() {
         AssignNode assign;
+        IdentNode ident;
         ExpressionNode expr;
         Token token = consume(TokenType.IDENT);
         consume(TokenType.ASSIGN);
+        ident = new IdentNode(token.getLiteral());
         expr = parseExpression();
-        assign = new AssignNode(token.getLiteral(), expr);
+        assign = new AssignNode(ident, expr);
         return assign;
     }
 
     CallNode parseCall() {
         CallNode call;
+        IdentNode ident;
         Token token;
         consume(TokenType.CALL);
         if (lookahead() == TokenType.IDENT) {
             token = consume(TokenType.IDENT);
-            call = new CallNode(token.getLiteral());
+            ident = new IdentNode(token.getLiteral());
+            call = new CallNode(ident);
         } else {
             ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.IDENT) ~
                 " expected, but found " ~ to!string(lookahead()) ~ " in parseCall",
@@ -243,11 +247,13 @@ class Parser {
 
     ReadNode parseRead() {
         ReadNode read;
+        IdentNode ident;
         Token token;
         consume(TokenType.READ);
         if (lookahead() == TokenType.IDENT) {
             token = consume(TokenType.IDENT);
-            read = new ReadNode(token.getLiteral());
+            ident = new IdentNode(token.getLiteral());
+            read = new ReadNode(ident);
         } else {
             ErrorManager.addParserError(ErrorLevel.ERROR, to!string(TokenType.IDENT) ~
                 " expected, but found " ~ to!string(lookahead()) ~ " in parseRead",

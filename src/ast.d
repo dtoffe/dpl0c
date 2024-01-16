@@ -154,25 +154,16 @@ abstract class StatementNode : AstNode {
 
 class AssignNode : StatementNode {
 
-    string identName;
-    int symbolId;
+    IdentNode ident;
     ExpressionNode expression;
 
-    this(string identName, ExpressionNode expression) {
-        this.identName = identName;
+    this(IdentNode ident, ExpressionNode expression) {
+        this.ident = ident;
         this.expression = expression;
     }
 
-    string getIdentName() {
-        return identName;
-    }
-
-    int getSymbolId() {
-        return symbolId;
-    }
-
-    void setSymbolId(int symbolId) {
-        this.symbolId = symbolId;
+    IdentNode getIdent() {
+        return ident;
     }
 
     ExpressionNode getExpression() {
@@ -187,23 +178,14 @@ class AssignNode : StatementNode {
 
 class CallNode : StatementNode {
 
-    string identName;
-    int symbolId;
+    IdentNode ident;
 
-    this(string identName) {
-        this.identName = identName;
+    this(IdentNode ident) {
+        this.ident = ident;
     }
 
-    string getIdentName() {
-        return identName;
-    }
-    
-    int getSymbolId() {
-        return symbolId;
-    }
-
-    void setSymbolId(int symbolId) {
-        this.symbolId = symbolId;
+    IdentNode getIdent() {
+        return ident;
     }
 
     override void accept(AstVisitor visitor) {
@@ -214,23 +196,14 @@ class CallNode : StatementNode {
 
 class ReadNode : StatementNode {
 
-    string varName;
-    int symbolId;
+    IdentNode ident;
 
-    this(string varName) {
-        this.varName = varName;
+    this(IdentNode ident) {
+        this.ident = ident;
     }
 
-    string getVarName() {
-        return varName;
-    }
-
-    int getSymbolId() {
-        return symbolId;
-    }
-
-    void setSymbolId(int symbolId) {
-        this.symbolId = symbolId;
+    IdentNode getIdent() {
+        return ident;
     }
 
     override void accept(AstVisitor visitor) {

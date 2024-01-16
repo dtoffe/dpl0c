@@ -103,18 +103,18 @@ class PrettyPrinter : AstVisitor {
 
     void visit(AssignNode node) {
         printIndent();
-        write(node.getIdentName, " := ");
+        write(node.getIdent().getName(), " := ");
         node.getExpression().accept(this);
     }
 
     void visit(CallNode node) {
         printIndent();
-        write("call ", node.getIdentName());
+        write("call ", node.getIdent().getName());
     }
 
     void visit(ReadNode node) {
         printIndent();
-        write("read ", node.getVarName());
+        write("read ", node.getIdent().getName());
     }
 
     void visit(WriteNode node) {
