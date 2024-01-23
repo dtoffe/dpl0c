@@ -33,7 +33,7 @@ enum SymbolType {
 
 static int nextId = 0;
 
-struct Symbol {
+class Symbol {
 
     int id;
     string name;
@@ -113,12 +113,12 @@ static void exitScope() {
 }
 
 static bool createSymbol(string name, SymbolKind kind, SymbolType type, int value) {
-    Symbol entry = Symbol(name, kind, type, value);
+    Symbol entry = new Symbol(name, kind, type, value);
     if (!(name in currentScope.symbolTable)) {
-        Symbol* foundSymbol;
-        if ((foundSymbol = lookupSymbol(name)) != null) {
+        Symbol foundSymbol;
+        if ((foundSymbol = lookupSymbol(name)) !is null) {
             ErrorManager.addScopeError(ErrorLevel.WARNING, "Warning: Local Identifier '" ~
-                    name ~ "' hides another identifier declared in scope: " ~ (*foundSymbol).scopeName);
+                    name ~ "' hides another identifier declared in scope: " ~ foundSymbol.scopeName);
         }
         currentScope.symbolTable[name] = entry;
         symbols[entry.id] = entry;
@@ -132,11 +132,11 @@ static bool createSymbol(string name, SymbolKind kind, SymbolType type, int valu
     }
 }
 
-static Symbol* lookupSymbol(string name) {
+static Symbol lookupSymbol(string name) {
     Scope searchScope = currentScope;
     while (searchScope !is null) {
         if (name in searchScope.symbolTable) {
-            return &(searchScope.symbolTable[name]);
+            return (searchScope.symbolTable[name]);
         } else {
             searchScope = searchScope.parent;
         }

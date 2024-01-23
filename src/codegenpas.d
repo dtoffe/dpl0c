@@ -105,25 +105,25 @@ class PascalCodeGenerator : AstVisitor {
     }
 
     void visit(ConstDeclNode node) {
-        Symbol* foundSymbol;
+        Symbol foundSymbol;
         string symbolName = node.getIdent().getName();
-        if ((foundSymbol = lookupSymbol(symbolName)) != null) {
+        if ((foundSymbol = lookupSymbol(symbolName)) !is null) {
             emit(symbolName ~ " = " ~ to!string(node.getNumber().getValue()));
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ (*foundSymbol).scopeName ~ "'.");
+                    not found in scope: '" ~ foundSymbol.scopeName ~ "'.");
         }
     }
 
     void visit(VarDeclNode node) {
-        Symbol* foundSymbol;
+        Symbol foundSymbol;
         string symbolName = node.getIdent().getName();
-        if ((foundSymbol = lookupSymbol(symbolName)) != null) {
+        if ((foundSymbol = lookupSymbol(symbolName)) !is null) {
             printIndent();
             emit(symbolName);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ (*foundSymbol).scopeName ~ "'.");
+                    not found in scope: '" ~ foundSymbol.scopeName ~ "'.");
         }
     }
 
@@ -141,32 +141,32 @@ class PascalCodeGenerator : AstVisitor {
     //void visit(StatementNode node); // abstract
     
     void visit(AssignNode node) {
-        Symbol* foundSymbol;
-        string symbolName = node.getIdentName();
-        if ((foundSymbol = lookupSymbol(symbolName)) != null) {
+        Symbol foundSymbol;
+        string symbolName = node.getIdent().getName();
+        if ((foundSymbol = lookupSymbol(symbolName)) !is null) {
             printIndent();
-            emit(node.getIdentName() ~ " := ");
+            emit(node.getIdent().getName() ~ " := ");
             node.getExpression().accept(this);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ (*foundSymbol).scopeName ~ "'.");
+                    not found in scope: '" ~ foundSymbol.scopeName ~ "'.");
         }
     }
 
     void visit(CallNode node) {
         printIndent();
-        emit(node.getIdentName() ~ "()");
+        emit(node.getIdent().getName() ~ "()");
     }
 
     void visit(ReadNode node) {
-        Symbol* foundSymbol;
-        string symbolName = node.getVarName();
-        if ((foundSymbol = lookupSymbol(symbolName)) != null) {
+        Symbol foundSymbol;
+        string symbolName = node.getIdent().getName();
+        if ((foundSymbol = lookupSymbol(symbolName)) !is null) {
             printIndent();
             emit("readln(" ~ symbolName ~ ")");
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ (*foundSymbol).scopeName ~ "'.");
+                    not found in scope: '" ~ foundSymbol.scopeName ~ "'.");
         }
     }
 
