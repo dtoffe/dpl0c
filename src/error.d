@@ -44,6 +44,16 @@ static class ErrorManager {
         errors = new ErrorMessage[MAX_ERRORS];
     }
 
+    static int errorsFound() {
+        int count = 0;
+        foreach (error; errors[0..errorCount]) {
+            if (error.level == ErrorLevel.ERROR) {
+                count = count + 1;
+            }
+        }
+        return count;
+    }
+
     static void addError(ErrorType type, ErrorLevel level, string message) {
         if (errorCount < MAX_ERRORS - 1) {
             errors[errorCount++] = ErrorMessage(type, level, message);

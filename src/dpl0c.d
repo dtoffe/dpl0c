@@ -38,14 +38,19 @@ void main(string[] args) {
 
     ScopeChecker checker = new ScopeChecker(sourceFileName);
     node.accept(checker);
-    ErrorManager.printErrors();
+    //ErrorManager.printErrors();
 
-    // LLVMCodeGenerator llvmCodeGenerator = new LLVMCodeGenerator(sourceFileName, false);
-    // node.accept(llvmCodeGenerator);
-    // // ErrorManager.printErrors();
+    if (ErrorManager.errorsFound() > 0) {
+        writeln("Errors found in compilation, cannot generate source code.");
+        ErrorManager.printErrors();
+    } else {
+        PascalCodeGenerator pascalCodeGenerator = new PascalCodeGenerator(sourceFileName);
+        node.accept(pascalCodeGenerator);
+        // ErrorManager.printErrors();
 
-    PascalCodeGenerator pascalCodeGenerator = new PascalCodeGenerator(sourceFileName);
-    node.accept(pascalCodeGenerator);
-    // ErrorManager.printErrors();
+        // LLVMCodeGenerator llvmCodeGenerator = new LLVMCodeGenerator(sourceFileName, false);
+        // node.accept(llvmCodeGenerator);
+        // // ErrorManager.printErrors();
+    }
 
 }

@@ -62,7 +62,6 @@ class Symbol {
 
 }
 
-// A struct can not contain a field of the same struct type, that's why a class is used
 class Scope {
     string name;
     Symbol[string] symbolTable;
