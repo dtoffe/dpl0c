@@ -6,6 +6,7 @@ module symtable;
 
 import llvm;
 import std.container.array;
+import std.conv;
 import std.stdio;
 import error;
 
@@ -63,51 +64,45 @@ class Symbol {
 }
 
 class Scope {
+
+    int id;
     string name;
     Symbol[string] symbolTable;
     Scope parent;
+
 }
 
 static Scope mainScope;
 
 static Scope currentScope;
 
-static Scope[string] scopes;
+static Scope[int] scopes;
 
 static Symbol[int] symbols;
 
-static void createScope(string name) {
+static void createScope(int id, string name) {
+    Scope newScope = new Scope();
+    newScope.id = id;
+    newScope.name = name;
+    newScope.symbolTable = new Symbol[string];
+    scopes[newScope.id] = newScope;
     if (mainScope is null) {
-        mainScope = new Scope();
-        mainScope.name = name;
-        mainScope.parent = null;
-        mainScope.symbolTable = new Symbol[string];
-        currentScope = mainScope;
-        scopes[mainScope.name] = mainScope;
+        newScope.parent = null;
+        mainScope = newScope;
     } else {
-        Scope newScope = new Scope();
-        newScope.name = currentScope.name ~ "_" ~ name;
         newScope.parent = currentScope;
-        newScope.symbolTable = new Symbol[string];
-        currentScope = newScope;
-        scopes[newScope.name] = newScope;
     }
-    writeln("Created new scope: " ~ currentScope.name);
+    currentScope = newScope;
+    writeln("Created new scope: " ~ currentScope.name ~ "(" ~ to!string(currentScope.id) ~ ") ");
 }
 
-static void enterScope(string name) {
-    string newScopeName;
-    if (currentScope is null) {
-        newScopeName = name;
-    } else {
-        newScopeName = currentScope.name ~ "_" ~ name;
-    }
-    currentScope = scopes[newScopeName];
-    writeln("Entered scope: " ~ currentScope.name);
+static void enterScope(int id, string name) {
+    currentScope = scopes[id];
+    writeln("Entered scope: " ~ currentScope.name ~ "(" ~ to!string(currentScope.id) ~ ") ");
 }
 
 static void exitScope() {
-    writeln("Exiting scope: " ~ currentScope.name);
+    writeln("Exiting scope: " ~ currentScope.name ~ "(" ~ to!string(currentScope.id) ~ ") ");
     currentScope = currentScope.parent;
 }
 

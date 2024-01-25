@@ -110,7 +110,7 @@ class LLVMCodeGenerator : AstVisitor {
         currentBasicBlock = mainEntryBlock;
         LLVMPositionBuilderAtEnd(llvmBuilder, mainEntryBlock);
 
-        enterScope("main");
+        enterScope(node.getIdent().getSymbolId(), node.getIdent().getName());
         node.getBlock().accept(this);
         exitScope();
 
@@ -178,12 +178,12 @@ class LLVMCodeGenerator : AstVisitor {
         LLVMTypeRef procType = LLVMFunctionType(LLVMInt32Type(), procArgs.ptr, cast(uint) procArgs.length, false);
         LLVMValueRef thisProcedure = LLVMAddFunction(llvmModule, cast(char*)name.toStringz(), procType);
         LLVMValueRef parentFunction = currentFunction;
-        name = name ~ "_main";
+        //name = name ~ "_main";
         LLVMBasicBlockRef procBasicBlock = LLVMAppendBasicBlock(thisProcedure, cast(char*)name.toStringz());
         currentBasicBlock = procBasicBlock;
         currentFunction = thisProcedure;
         LLVMPositionBuilderAtEnd(llvmBuilder, procBasicBlock);
-        enterScope(name);
+        enterScope(node.getIdent().getSymbolId(), node.getIdent().getName());
         node.getBlock().accept(this);
         exitScope();
         LLVMBuildRet(llvmBuilder, LLVMConstInt(LLVMInt32Type(), 0, true));

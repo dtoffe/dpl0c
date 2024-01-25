@@ -70,7 +70,7 @@ class Parser {
     }
 
     ProgramNode parseProgram() {
-        ProgramNode program = new ProgramNode();
+        ProgramNode program = new ProgramNode(new IdentNode("main"));
         // Get the first token from the input so lookahead() does not return null
         currentToken = lexer.nextToken();
         program.block = parseBlock();

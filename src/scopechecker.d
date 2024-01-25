@@ -4,6 +4,7 @@
  */
 module scopechecker;
 
+import std.conv;
 import std.stdio;
 import std.string;
 import ast;
@@ -31,7 +32,16 @@ class ScopeChecker : AstVisitor {
     }
 
     void visit(ProgramNode node) {
-        symtable.createScope("main");
+        string name = node.getIdent().getName();
+
+        symtable.createScope(0, name);
+        symtable.createSymbol(name, SymbolKind.PROCEDURE, SymbolType.INTEGER, 0);
+        Symbol foundSymbol;
+        string symbolName = name;
+        if ((foundSymbol = lookupSymbol(symbolName)) !is null) {
+            node.getIdent().setSymbolId(foundSymbol.id);
+        }
+
         //symtable.enterScope("main");
         node.getBlock().accept(this);
         symtable.exitScope();
@@ -79,7 +89,7 @@ class ScopeChecker : AstVisitor {
         if ((foundSymbol = lookupSymbol(symbolName)) !is null) {
             node.getIdent().setSymbolId(foundSymbol.id);
         }
-        symtable.createScope(name);
+        symtable.createScope(foundSymbol.id, name);
         //symtable.enterScope(node.getProcName());
         node.getBlock().accept(this);
         symtable.exitScope();
