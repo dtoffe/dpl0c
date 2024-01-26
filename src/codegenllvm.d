@@ -150,7 +150,7 @@ class LLVMCodeGenerator : AstVisitor {
             symbols[node.getIdent().getSymbolId()].setValueRef(valRef);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ foundSymbol.sscope.name ~ "'.");
+                    not found in current or parent scopes.");
         }
     }
 
@@ -167,7 +167,7 @@ class LLVMCodeGenerator : AstVisitor {
             symbols[node.getIdent().getSymbolId()].setValueRef(valRef);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ foundSymbol.sscope.name ~ "'.");
+                    not found in current or parent scopes.");
         }
     }
 
@@ -208,7 +208,7 @@ class LLVMCodeGenerator : AstVisitor {
             LLVMBuildStore(llvmBuilder, expressionValue, variableRef);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ foundSymbol.sscope.name ~ "'.");
+                    not found in current or parent scopes.");
         }
     }
 
@@ -235,7 +235,7 @@ class LLVMCodeGenerator : AstVisitor {
             LLVMBuildStore(llvmBuilder, variableRef, readCall);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ foundSymbol.sscope.name ~ "'.");
+                    not found in current or parent scopes.");
         }
     }
 
@@ -414,7 +414,7 @@ class LLVMCodeGenerator : AstVisitor {
             variableRef = LLVMBuildLoad(llvmBuilder, symbols[node.getSymbolId()].getValueRef(), symbolName.toStringz());
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ foundSymbol.sscope.name ~ "'.");
+                    not found in current or parent scopes.");
         }
         node.setLlvmValue(variableRef);
     }

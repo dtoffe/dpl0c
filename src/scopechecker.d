@@ -99,7 +99,7 @@ class ScopeChecker : AstVisitor {
                 ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Procedure '" ~
                         symbolName ~ "' cannot be assigned a value.");
             }
-            writeln("Assign to variable: " ~ symbolName ~ " in scope: " ~ foundSymbol.sscope.name);
+            writeln("Assign to variable: " ~ symbolName ~ " in scope: " ~ foundSymbol.getScopeName());
             node.getIdent().setSymbolId(foundSymbol.id);
         } else {
             ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
@@ -120,7 +120,7 @@ class ScopeChecker : AstVisitor {
                 ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Variable '" ~
                         symbolName ~ "' cannot be called.");
             }
-            writeln("Call to procedure: " ~ symbolName ~ " in scope: " ~ foundSymbol.sscope.name);
+            writeln("Call to procedure: " ~ symbolName ~ " in scope: " ~ foundSymbol.getScopeName());
             node.getIdent().setSymbolId(foundSymbol.id);
         } else {
             ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
@@ -140,7 +140,7 @@ class ScopeChecker : AstVisitor {
                 ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Procedure '" ~
                         symbolName ~ "' cannot be read into.");
             }
-            writeln("Read into variable: " ~ symbolName ~ " in scope: " ~ foundSymbol.sscope.name);
+            writeln("Read into variable: " ~ symbolName ~ " in scope: " ~ foundSymbol.getScopeName());
             node.getIdent().setSymbolId(foundSymbol.id);
         } else {
             ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
@@ -214,10 +214,10 @@ class ScopeChecker : AstVisitor {
                         symbolName ~ "' cannot be part of an expression and must be CALLed.");
             }
             if (foundSymbol.kind == SymbolKind.CONST) {
-                writeln("Referenced constant: " ~ symbolName ~ " in scope: " ~ foundSymbol.sscope.name);
+                writeln("Referenced constant: " ~ symbolName ~ " in scope: " ~ foundSymbol.getScopeName());
             }
             if (foundSymbol.kind == SymbolKind.VAR) {
-                writeln("Referenced variable: " ~ symbolName ~ " in scope: " ~ foundSymbol.sscope.name);
+                writeln("Referenced variable: " ~ symbolName ~ " in scope: " ~ foundSymbol.getScopeName());
             }
             node.setSymbolId(foundSymbol.id);
         } else {

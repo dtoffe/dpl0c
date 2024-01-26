@@ -43,7 +43,7 @@ class Symbol {
     SymbolKind kind;
     SymbolType type;
     int value;  // This is the value for consts (and maybe vars?), and zero for procedures
-    Scope sscope;
+    int scopeId;
     LLVMValueRef valueRef;
 
     this(string name, SymbolKind kind, SymbolType type, int value) {
@@ -52,7 +52,11 @@ class Symbol {
         this.kind = kind;
         this.type = type;
         this.value = value;
-        this.sscope = currentScope;
+        this.scopeId = (currentScope is null) ? -1 : currentScope.id;
+    }
+
+    public string getScopeName() {
+        return scopes[this.scopeId].name;
     }
 
     public LLVMValueRef getValueRef() {
@@ -122,7 +126,7 @@ static Symbol createSymbol(string name, SymbolKind kind, SymbolType type, int va
         Symbol foundSymbol;
         if ((foundSymbol = lookupSymbol(name)) !is null) {
             ErrorManager.addScopeError(ErrorLevel.WARNING, "Warning: Local Identifier '" ~
-                    name ~ "' hides another identifier declared in scope: " ~ foundSymbol.sscope.name);
+                    name ~ "' hides another identifier declared in scope: " ~ foundSymbol.getScopeName());
         }
         if (kind == SymbolKind.PROCEDURE) {
             createScope(name);
