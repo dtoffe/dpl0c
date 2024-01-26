@@ -111,7 +111,7 @@ class PascalCodeGenerator : AstVisitor {
             emit(symbolName ~ " = " ~ to!string(node.getNumber().getValue()));
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ foundSymbol.scopeName ~ "'.");
+                    not found in scope: '" ~ foundSymbol.sscope.name ~ "'.");
         }
     }
 
@@ -123,7 +123,7 @@ class PascalCodeGenerator : AstVisitor {
             emit(symbolName);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ foundSymbol.scopeName ~ "'.");
+                    not found in scope: '" ~ foundSymbol.sscope.name ~ "'.");
         }
     }
 
@@ -149,7 +149,7 @@ class PascalCodeGenerator : AstVisitor {
             node.getExpression().accept(this);
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ foundSymbol.scopeName ~ "'.");
+                    not found in scope: '" ~ foundSymbol.sscope.name ~ "'.");
         }
     }
 
@@ -166,7 +166,7 @@ class PascalCodeGenerator : AstVisitor {
             emit("readln(" ~ symbolName ~ ")");
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
-                    not found in scope: '" ~ foundSymbol.scopeName ~ "'.");
+                    not found in scope: '" ~ foundSymbol.sscope.name ~ "'.");
         }
     }
 

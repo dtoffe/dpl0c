@@ -35,12 +35,9 @@ class ScopeChecker : AstVisitor {
         string name = node.getIdent().getName();
 
         symtable.createScope(0, name);
-        symtable.createSymbol(name, SymbolKind.PROCEDURE, SymbolType.INTEGER, 0);
-        Symbol foundSymbol;
-        string symbolName = name;
-        if ((foundSymbol = lookupSymbol(symbolName)) !is null) {
-            node.getIdent().setSymbolId(foundSymbol.id);
-        }
+        Symbol newSymbol = symtable.createSymbol(name, SymbolKind.PROCEDURE, SymbolType.INTEGER, 0);
+
+        node.getIdent().setSymbolId(newSymbol.id);
 
         //symtable.enterScope("main");
         node.getBlock().accept(this);
@@ -83,13 +80,9 @@ class ScopeChecker : AstVisitor {
 
     void visit(ProcDeclNode node) {
         string name = node.getIdent().getName();
-        symtable.createSymbol(name, SymbolKind.PROCEDURE, SymbolType.INTEGER, 0);
-        Symbol foundSymbol;
-        string symbolName = name;
-        if ((foundSymbol = lookupSymbol(symbolName)) !is null) {
-            node.getIdent().setSymbolId(foundSymbol.id);
-        }
-        symtable.createScope(foundSymbol.id, name);
+        Symbol newSymbol = symtable.createSymbol(name, SymbolKind.PROCEDURE, SymbolType.INTEGER, 0);
+        node.getIdent().setSymbolId(newSymbol.id);
+        symtable.createScope(newSymbol.id, name);
         //symtable.enterScope(node.getProcName());
         node.getBlock().accept(this);
         symtable.exitScope();
@@ -112,7 +105,7 @@ class ScopeChecker : AstVisitor {
                 ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Procedure '" ~
                         symbolName ~ "' cannot be assigned a value.");
             }
-            writeln("Assign to variable: " ~ symbolName ~ " in scope: " ~ foundSymbol.scopeName);
+            writeln("Assign to variable: " ~ symbolName ~ " in scope: " ~ foundSymbol.sscope.name);
             node.getIdent().setSymbolId(foundSymbol.id);
         } else {
             ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
@@ -133,7 +126,7 @@ class ScopeChecker : AstVisitor {
                 ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Variable '" ~
                         symbolName ~ "' cannot be called.");
             }
-            writeln("Call to procedure: " ~ symbolName ~ " in scope: " ~ foundSymbol.scopeName);
+            writeln("Call to procedure: " ~ symbolName ~ " in scope: " ~ foundSymbol.sscope.name);
             node.getIdent().setSymbolId(foundSymbol.id);
         } else {
             ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
@@ -153,7 +146,7 @@ class ScopeChecker : AstVisitor {
                 ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Procedure '" ~
                         symbolName ~ "' cannot be read into.");
             }
-            writeln("Read into variable: " ~ symbolName ~ " in scope: " ~ foundSymbol.scopeName);
+            writeln("Read into variable: " ~ symbolName ~ " in scope: " ~ foundSymbol.sscope.name);
             node.getIdent().setSymbolId(foundSymbol.id);
         } else {
             ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
@@ -227,10 +220,10 @@ class ScopeChecker : AstVisitor {
                         symbolName ~ "' cannot be part of an expression and must be CALLed.");
             }
             if (foundSymbol.kind == SymbolKind.CONST) {
-                writeln("Referenced constant: " ~ symbolName ~ " in scope: " ~ foundSymbol.scopeName);
+                writeln("Referenced constant: " ~ symbolName ~ " in scope: " ~ foundSymbol.sscope.name);
             }
             if (foundSymbol.kind == SymbolKind.VAR) {
-                writeln("Referenced variable: " ~ symbolName ~ " in scope: " ~ foundSymbol.scopeName);
+                writeln("Referenced variable: " ~ symbolName ~ " in scope: " ~ foundSymbol.sscope.name);
             }
             node.setSymbolId(foundSymbol.id);
         } else {

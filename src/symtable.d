@@ -38,19 +38,19 @@ class Symbol {
 
     int id;
     string name;
-    string scopeName;
     SymbolKind kind;
     SymbolType type;
     int value;  // This is the value for consts (and maybe vars?), and zero for procedures
+    Scope sscope;
     LLVMValueRef valueRef;
 
     this(string name, SymbolKind kind, SymbolType type, int value) {
         this.id = nextId++;
         this.name = name;
-        this.scopeName = currentScope.name;
         this.kind = kind;
         this.type = type;
         this.value = value;
+        this.sscope = currentScope;
     }
 
     public LLVMValueRef getValueRef() {
@@ -70,6 +70,11 @@ class Scope {
     Symbol[string] symbolTable;
     Scope parent;
 
+    this(int id, string name) {
+        this.id = id;
+        this.name = name;
+    }
+
 }
 
 static Scope mainScope;
@@ -81,9 +86,7 @@ static Scope[int] scopes;
 static Symbol[int] symbols;
 
 static void createScope(int id, string name) {
-    Scope newScope = new Scope();
-    newScope.id = id;
-    newScope.name = name;
+    Scope newScope = new Scope(id, name);
     newScope.symbolTable = new Symbol[string];
     scopes[newScope.id] = newScope;
     if (mainScope is null) {
@@ -106,23 +109,23 @@ static void exitScope() {
     currentScope = currentScope.parent;
 }
 
-static bool createSymbol(string name, SymbolKind kind, SymbolType type, int value) {
+static Symbol createSymbol(string name, SymbolKind kind, SymbolType type, int value) {
     Symbol entry = new Symbol(name, kind, type, value);
     if (!(name in currentScope.symbolTable)) {
         Symbol foundSymbol;
         if ((foundSymbol = lookupSymbol(name)) !is null) {
             ErrorManager.addScopeError(ErrorLevel.WARNING, "Warning: Local Identifier '" ~
-                    name ~ "' hides another identifier declared in scope: " ~ foundSymbol.scopeName);
+                    name ~ "' hides another identifier declared in scope: " ~ foundSymbol.sscope.name);
         }
         currentScope.symbolTable[name] = entry;
         symbols[entry.id] = entry;
         writeln("Created new symbol: " ~ name ~ " in scope: " ~ currentScope.name);
-        return true;
+        return entry;
     } else {
         ErrorManager.addScopeError(ErrorLevel.ERROR, "Warning: Identifier '" ~
                 name ~ "' already declared in the current scope.");
         writeln("New symbol: '" ~ name ~ "' already declared in scope: " ~ currentScope.name);
-        return false;
+        return null;
     }
 }
 
