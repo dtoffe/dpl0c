@@ -48,7 +48,7 @@ The compiler is written in D and features:
   - Conditions are also handled by the grammar, so there is no need for a boolean datatype.
   - :warning: I'm thinking of introducing error correction or recovery in the future, using the technique explained in A+DS=P book (Chapter 5) by N. Wirth.
 - :heavy_check_mark: Abstract syntax tree created by the parser.
-- :warning: A symbol table used to keep track of symbols and their scopes. The Symbol table is built by the semantic checking visitor and used by all the code generation visitors.
+- :heavy_check_mark: A symbol table used to keep track of symbols and their scopes. The symbol table is built by the semantic checking visitor and used by all the code generation visitors.
 - AST traversal implemented with a Visitor pattern.
   - :heavy_check_mark: A prettyprinter visitor to print the input source in a well formatted style.
   - :heavy_check_mark: A symbol table builder and semantic checking visitor (only scopes, because the language has only integers so there is no point in doing type checking).
