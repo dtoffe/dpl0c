@@ -43,15 +43,16 @@ Comments start with "//", on its own line or after a statement, and go until the
 The compiler is written in D and features:
 
 - :heavy_check_mark: A hand-coded scanner.
-- :warning: A hand-coded recursive descent parser (currently I'm rewriting part of it to make the code clearer to follow and to introduce error correction or recovery in the future).
+- :heavy_check_mark: A hand-coded recursive descent parser.
   - There is no precedence climbing: since the language is so small, the precedence is handled by the grammar.
   - Conditions are also handled by the grammar, so there is no need for a boolean datatype.
+  - :warning: I'm thinking of introducing error correction or recovery in the future, using the technique explained in A+DS=P book (Chapter 5) by N. Wirth.
 - :heavy_check_mark: Abstract syntax tree created by the parser.
-- :warning: A symbol table used to keep track of variables and their scopes, built by the semantic checking visitor and used by the code generation visitors (I'm about to modify it to allow for symbol aliasing or renaming, needed for some code generators, in fact, maybe all but the Pascal code generator).
+- :warning: A symbol table used to keep track of symbols and their scopes. The Symbol table is built by the semantic checking visitor and used by all the code generation visitors.
 - AST traversal implemented with a Visitor pattern.
-  - :heavy_check_mark: A prettyprinter visitor.
-  - :heavy_check_mark: A symbol table builder and semantic checking visitor.
-  - :construction: A handful of visitors for the code generation backend (see details below).
+  - :heavy_check_mark: A prettyprinter visitor to print the input source in a well formatted style.
+  - :heavy_check_mark: A symbol table builder and semantic checking visitor (only scopes, because the language has only integers so there is no point in doing type checking).
+  - :warning: A handful of visitors for the code generation backend (see details below).
 - Code generators:
   - :heavy_check_mark: A transpiling code generator which emits Pascal source code. (Granted, reading PL/0 and emitting Pascal should count as cheating).
     - The main examples are tested and run OK.
