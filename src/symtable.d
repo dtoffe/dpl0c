@@ -32,7 +32,9 @@ enum SymbolType {
     INTEGER
 }
 
-static int nextId = 0;
+static const MAIN_SCOPE = 0;
+
+static int nextId = MAIN_SCOPE;
 
 class Symbol {
 
@@ -63,16 +65,13 @@ class Symbol {
 
 }
 
-class Scope {
+class Scope : Symbol {
 
-    int id;
-    string name;
     Symbol[string] symbolTable;
     Scope parent;
 
-    this(int id, string name) {
-        this.id = id;
-        this.name = name;
+    this(string name) {
+        super(name, SymbolKind.PROCEDURE, SymbolType.INTEGER, 0);
     }
 
 }
@@ -85,8 +84,12 @@ static Scope[int] scopes;
 
 static Symbol[int] symbols;
 
-static void createScope(int id, string name) {
-    Scope newScope = new Scope(id, name);
+static void initialize () {
+    createScope("main");
+}
+
+static void createScope(string name) {
+    Scope newScope = new Scope(name);
     newScope.symbolTable = new Symbol[string];
     scopes[newScope.id] = newScope;
     if (mainScope is null) {
@@ -94,12 +97,16 @@ static void createScope(int id, string name) {
         mainScope = newScope;
     } else {
         newScope.parent = currentScope;
+        currentScope.symbolTable[name] = newScope;
     }
+    symbols[newScope.id] = newScope;
+    writeln("Created new scope: " ~ newScope.name ~ "(" ~ to!string(newScope.id) ~
+                ") in scope: " ~ (currentScope is null ? "null" : currentScope.name) ~
+                "(" ~ to!string((currentScope is null ? -1 : currentScope.id)) ~ ")");
     currentScope = newScope;
-    writeln("Created new scope: " ~ currentScope.name ~ "(" ~ to!string(currentScope.id) ~ ") ");
 }
 
-static void enterScope(int id, string name) {
+static void enterScope(int id) {
     currentScope = scopes[id];
     writeln("Entered scope: " ~ currentScope.name ~ "(" ~ to!string(currentScope.id) ~ ") ");
 }
@@ -110,23 +117,29 @@ static void exitScope() {
 }
 
 static Symbol createSymbol(string name, SymbolKind kind, SymbolType type, int value) {
-    Symbol entry = new Symbol(name, kind, type, value);
+    Symbol entry;
     if (!(name in currentScope.symbolTable)) {
         Symbol foundSymbol;
         if ((foundSymbol = lookupSymbol(name)) !is null) {
             ErrorManager.addScopeError(ErrorLevel.WARNING, "Warning: Local Identifier '" ~
                     name ~ "' hides another identifier declared in scope: " ~ foundSymbol.sscope.name);
         }
-        currentScope.symbolTable[name] = entry;
-        symbols[entry.id] = entry;
-        writeln("Created new symbol: " ~ name ~ " in scope: " ~ currentScope.name);
-        return entry;
+        if (kind == SymbolKind.PROCEDURE) {
+            createScope(name);
+            entry = currentScope;
+        } else {
+            entry = new Symbol(name, kind, type, value);
+            currentScope.symbolTable[name] = entry;
+            symbols[entry.id] = entry;
+            writeln("Created new symbol: " ~ name ~ " in scope: " ~ currentScope.name ~
+                        "(" ~ to!string(currentScope.id) ~ ")");
+        }
     } else {
         ErrorManager.addScopeError(ErrorLevel.ERROR, "Warning: Identifier '" ~
                 name ~ "' already declared in the current scope.");
         writeln("New symbol: '" ~ name ~ "' already declared in scope: " ~ currentScope.name);
-        return null;
     }
+    return entry;
 }
 
 static Symbol lookupSymbol(string name) {

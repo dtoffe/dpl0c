@@ -47,7 +47,7 @@ class PascalCodeGenerator : AstVisitor {
         emit("program " ~ result ~ ";\n");
         emit("\n");
 
-        enterScope(node.getIdent().getSymbolId(), node.getIdent().getName());
+        enterScope(symtable.MAIN_SCOPE);
         node.getBlock().accept(this);
         exitScope();
 
@@ -131,7 +131,7 @@ class PascalCodeGenerator : AstVisitor {
         printIndent();
         emit("procedure " ~ node.getIdent().getName() ~ "();\n");
         emit("\n");
-        enterScope(node.getIdent().getSymbolId(), node.getIdent().getName());
+        enterScope(node.getIdent().getSymbolId());
         node.getBlock().accept(this);
         exitScope();
         emit(";\n");

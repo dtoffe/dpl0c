@@ -18,17 +18,11 @@ abstract class AstNode {
 
 class ProgramNode : AstNode {
 
-    IdentNode ident;    // The name of the program defaults to "main" and defines a main scope
     BlockNode block;
 
-    this(IdentNode ident) {
-        this.ident = ident;
+    this() {
     }
     
-    IdentNode getIdent() {
-        return ident;
-    }
-
     BlockNode getBlock() {
         return block;
     }
