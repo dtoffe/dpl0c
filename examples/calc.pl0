@@ -8,30 +8,29 @@
 // - Use "#" instead of "<>" for not-equal.
 // - Use "var" to declare variables, instead of "int".
 
-// Const DIV renamed to DIVI because DIV is a reserved word in Pascal
-const opADD = 1, opSUB = 2, opMULT = 3, opDIV = 4;
+const ADD = 1, SUB = 2, MULT = 3, DIV = 4;
 
 var op, x, y, done;
 
-procedure doAdd;
+procedure add;
 begin
     x := x + y;
     write x
 end;
 
-procedure doSub;
+procedure sub;
 begin
     x := x - y;
     write x
 end;
 
-procedure doMult;
+procedure mult;
 begin
     x := x * y;
     write x
 end;
 
-procedure doDiv;
+procedure div;
 begin
     // Check for divide-by-zero errors
     if y # 0 then
@@ -56,14 +55,14 @@ begin
         if done = 0 then
         begin
             read y;
-            if op = opADD then
-                call doAdd;
-            if op = opSUB then
-                call doSub;
-            if op = opMULT then
-                call doMult;
-            if op = opDIV then
-                call doDiv
+            if op = ADD then
+                call add;
+            if op = SUB then
+                call sub;
+            if op = MULT then
+                call mult;
+            if op = DIV then
+                call div
             //else done := 1;
         end
     end

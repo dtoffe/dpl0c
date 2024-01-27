@@ -54,20 +54,20 @@ program math;
     procedure gcd();
 
         var
-            f,
+            f_,
             g : integer;
 
     begin
-        f := x;
+        f_ := x;
         g := y;
-        while f <> g do
+        while f_ <> g do
             begin
-                if f < g then
-                    g := g - f;
-                if g < f then
-                    f := f - g
+                if f_ < g then
+                    g := g - f_;
+                if g < f_ then
+                    f_ := f_ - g
             end;
-        z := f
+        z := f_
     end;
 
     procedure fact();

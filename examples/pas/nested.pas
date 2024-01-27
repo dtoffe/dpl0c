@@ -1,9 +1,9 @@
 program nested;
 
-    const opADD = 1;
-    const opSUB = 2;
-    const opMULT = 3;
-    const opDIV = 4;
+    const ADD = 1;
+    const SUB = 2;
+    const MULT = 3;
+    const DIV_ = 4;
 
     var
         op,
@@ -13,19 +13,19 @@ program nested;
 
     procedure calculate();
 
-        procedure doAdd();
+        procedure add_();
 
         begin
             x := x + y
         end;
 
-        procedure doSub();
+        procedure sub_();
 
         begin
             x := x - y
         end;
 
-        procedure doMult();
+        procedure mult_();
 
             var
                 c : integer;
@@ -34,7 +34,7 @@ program nested;
             x := x * y
         end;
 
-        procedure doDiv();
+        procedure div__();
 
         begin
             if y <> 0 then
@@ -44,14 +44,14 @@ program nested;
         end;
 
     begin
-        if op = opADD then
-            doAdd();
-        if op = opSUB then
-            doSub();
-        if op = opMULT then
-            doMult();
-        if op = opDIV then
-            doDiv();
+        if op = ADD then
+            add_();
+        if op = SUB then
+            sub_();
+        if op = MULT then
+            mult_();
+        if op = DIV_ then
+            div__();
         if done = 0 then
             writeln(x)
     end;
