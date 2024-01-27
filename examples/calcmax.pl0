@@ -1,0 +1,20 @@
+const MAX = 100;
+
+var max, a, b;
+
+procedure Max;
+begin
+    if a >= b then
+        max := a;
+    if b > a then
+        max := b;
+    if max < MAX then
+        max := MAX
+end;
+
+begin
+    read a;
+    read b;
+    call Max;
+    write max
+end.
