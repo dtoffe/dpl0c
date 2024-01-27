@@ -40,6 +40,7 @@ class Symbol {
 
     int id;
     string name;
+    string nick;
     SymbolKind kind;
     SymbolType type;
     int value;  // This is the value for consts (and maybe vars?), and zero for procedures
@@ -49,6 +50,7 @@ class Symbol {
     this(string name, SymbolKind kind, SymbolType type, int value) {
         this.id = nextId++;
         this.name = name;
+        this.nick = name;
         this.kind = kind;
         this.type = type;
         this.value = value;

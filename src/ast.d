@@ -460,6 +460,10 @@ class IdentNode : FactorNode {
         return name;
     }
 
+    string getNick() {
+        return symbols[symbolId].nick;
+    }
+
     int getSymbolId() {
         return symbolId;
     }
