@@ -7,6 +7,7 @@ module dpl0c;
 import std.file;
 import std.stdio;
 import ast;
+import codegenc;
 import codegenllvm;
 import codegenpas;
 import error;
@@ -44,12 +45,12 @@ void main(string[] args) {
         writeln("Errors found in compilation, cannot generate source code.");
         ErrorManager.printErrors();
     } else {
-        PascalCodeGenerator pascalCodeGenerator = new PascalCodeGenerator(sourceFileName);
-        node.accept(pascalCodeGenerator);
+        // PascalCodeGenerator pascalCodeGenerator = new PascalCodeGenerator(sourceFileName);
+        // node.accept(pascalCodeGenerator);
         // ErrorManager.printErrors();
 
-        // LLVMCodeGenerator llvmCodeGenerator = new LLVMCodeGenerator(sourceFileName, false);
-        // node.accept(llvmCodeGenerator);
+        CCodeGenerator cCodeGenerator = new CCodeGenerator(sourceFileName);
+        node.accept(cCodeGenerator);
         // // ErrorManager.printErrors();
     }
 

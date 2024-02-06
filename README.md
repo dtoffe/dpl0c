@@ -55,9 +55,9 @@ The compiler is written in D and features:
   - :warning: A handful of visitors for the code generation backend (see details below).
 - Code generators:
   - :heavy_check_mark: A transpiling code generator which emits Pascal source code. (Granted, reading PL/0 and emitting Pascal should count as cheating).
-    - The main examples are tested and run OK.
-  - :construction: A transpiling code generator which emits C source code. (Other languages do this, so probably not cheating, or cheating not so much).
-    - Just started working on it.
+    - The examples are tested and run OK.
+  - :heavy_check_mark: A transpiling code generator which emits C source code. (Other languages do this, so probably not cheating, or cheating not so much).
+    - The examples are tested and run OK.
   - :construction: An [LLVM IR](https://llvm.org/) code generator.
     - It's almost finished, but still working on proper nesting of scopes.
   - :interrobang: A [QBE](https://c9x.me/compile/) code generator.

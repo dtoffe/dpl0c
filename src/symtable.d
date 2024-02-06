@@ -5,7 +5,6 @@
 module symtable;
 
 import llvm;
-import std.container.array;
 import std.conv;
 import std.stdio;
 import error;
