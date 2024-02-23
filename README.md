@@ -93,6 +93,4 @@ Take a look at the examples in the [examples/README.md](examples/README.md) file
 
 - Walter Bright, the designer of the D language and developer of its compiler and libraries, for sharing his [wisdom regarding compiler development](https://forum.dlang.org/post/up9gir$1rd6$1@digitalmars.com):
 
-<div align="center">
-    ![Persistence](docs/cauliflower.png "Persistence")
-</div>
+![Persistence](docs/cauliflower.png "Persistence")
