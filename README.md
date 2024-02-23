@@ -57,7 +57,7 @@ The compiler is written in D and features:
   - :heavy_check_mark: A transpiling code generator which emits Pascal source code. (Granted, reading PL/0 and emitting Pascal should count as cheating).
     - The examples are tested and run OK.
   - :heavy_check_mark: A transpiling code generator which emits C source code. (Other languages do this, so probably not cheating, or cheating not so much).
-    - The examples are tested and run OK.
+    - ~~The examples are tested and run OK.~~ Ops, found a bug, global variables and recursive calls don't mix well...
   - :construction: An [LLVM IR](https://llvm.org/) code generator.
     - It's almost finished, but still working on proper nesting of scopes.
   - :interrobang: A [QBE](https://c9x.me/compile/) code generator.
@@ -85,7 +85,12 @@ Take a look at the examples in the [examples/README.md](examples/README.md) file
 
 ## Thanks to
 
-- The guys at the D language forum, for some general language tips at the beginning of the project.
 - TNorthover at the Discord LLVM beginners channel for his help:
   - With the correct ordering of the basic blocks in the control flow statements.
   - In helping me understand the way of implementing the scoping of the variables in nested procedures.
+
+- The guys at the D language forum, for some general language tips at the beginning of the project.
+
+- Walter Bright, the designer of the D language and developer of its compiler and libraries, for sharing his [wisdom regarding compiler development](https://forum.dlang.org/post/up9gir$1rd6$1@digitalmars.com):
+
+![cauliflower](\docs\cauliflower.png "Persistence")
