@@ -1,56 +1,28 @@
 #include <stdio.h>
 
+void multiply(int *x, int *y, int *z);
+void divide(int *r, int *x, int *q, int *y);
+void gcd(int *x, int *y, int *z);
+void fact(int *n, int *f);
 
-int x;
-int y;
-int z;
-int q;
-int r;
-int n;
-int f;
-int a;
-int b;
-int w;
-int f_;
-int g;
 
-void multiply(void)
+void fact(int *n, int *f)
 {
-    a = x;
-    b = y;
-    z = 0;
-    while (b > 0)
+    if (*n > 1)
     {
-        if ((b) & 1)
-            z = z + a;
-        a = 2 * a;
-        b = b / 2;
+        *f = *n * *f;
+        *n = *n - 1;
+        fact(n, f);
     }
 }
 
-void divide(void)
+void gcd(int *x, int *y, int *z)
 {
-    r = x;
-    q = 0;
-    w = y;
-    while (w <= r)
-        w = 2 * w;
-    while (w > y)
-    {
-        q = 2 * q;
-        w = w / 2;
-        if (w <= r)
-        {
-            r = r - w;
-            q = q + 1;
-        }
-    }
-}
+    int f_;
+    int g;
 
-void gcd(void)
-{
-    f_ = x;
-    g = y;
+    f_ = *x;
+    g = *y;
     while (f_ != g)
     {
         if (f_ < g)
@@ -58,37 +30,73 @@ void gcd(void)
         if (g < f_)
             f_ = f_ - g;
     }
-    z = f_;
+    *z = f_;
 }
 
-void fact(void)
+void divide(int *r, int *x, int *q, int *y)
 {
-    if (n > 1)
+    int w;
+
+    *r = *x;
+    *q = 0;
+    w = *y;
+    while (w <= *r)
+        w = 2 * w;
+    while (w > *y)
     {
-        f = n * f;
-        n = n - 1;
-        fact();
+        *q = 2 * *q;
+        w = w / 2;
+        if (w <= *r)
+        {
+            *r = *r - w;
+            *q = *q + 1;
+        }
+    }
+}
+
+void multiply(int *x, int *y, int *z)
+{
+    int a;
+    int b;
+
+    a = *x;
+    b = *y;
+    *z = 0;
+    while (b > 0)
+    {
+        if ((b) & 1)
+            *z = *z + a;
+        a = 2 * a;
+        b = b / 2;
     }
 }
 
 int main(int argc, char *argv[])
 {
+    int x;
+    int y;
+    int z;
+    int q;
+    int r;
+    int n;
+    int f;
+
     scanf("%d", &x);
     scanf("%d", &y);
-    multiply();
+    multiply(&x, &y, &z);
     printf("%d\n", z);
     scanf("%d", &x);
     scanf("%d", &y);
-    divide();
+    divide(&r, &x, &q, &y);
     printf("%d\n", q);
     printf("%d\n", r);
     scanf("%d", &x);
     scanf("%d", &y);
-    gcd();
+    gcd(&x, &y, &z);
     printf("%d\n", z);
     scanf("%d", &n);
     f = 1;
-    fact();
+    fact(&n, &f);
     printf("%d\n", f);
     return 0;
 }

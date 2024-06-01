@@ -1,30 +1,33 @@
 #include <stdio.h>
 
+void fact(int *n, int *f);
 
-int f;
-int n;
-int ans1;
 
-void fact(void)
+void fact(int *n, int *f)
 {
-    ans1 = n;
-    n = n - 1;
-    if (n == 0)
-        f = 1;
-    if (n > 0)
-        fact();
-    f = f * ans1;
+    int ans1;
+
+    ans1 = *n;
+    *n = *n - 1;
+    if (*n == 0)
+        *f = 1;
+    if (*n > 0)
+        fact(n, f);
+    *f = *f * ans1;
 }
 
 int main(int argc, char *argv[])
 {
+    int f;
+    int n;
+
     scanf("%d", &n);
     if (n < 0)
         f = -1;
     if (n == 0)
         f = 1;
     if (n > 0)
-        fact();
+        fact(&n, &f);
     printf("%d\n", f);
     return 0;
 }

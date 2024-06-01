@@ -19,8 +19,9 @@ class CCodeGenerator : AstVisitor {
     string name;
     private int indentLevel = 0;
     string sourceFileText = "";
-    string constSection = "";
-    string varSection = "";
+    string funcProtoSection = "";
+    string[int] constSection;
+    string[int] varSection;
     string[int] procSection;
 
     this(string name) {
@@ -43,12 +44,16 @@ class CCodeGenerator : AstVisitor {
         sourceFileText = sourceFileText ~ text;
     }
 
+    private void emitFuncProto(string text) {
+        funcProtoSection = funcProtoSection ~ text;    
+    }
+
     private void emitConst(string text) {
-        constSection = constSection ~ text;
+        constSection[currentScope.id] = constSection[currentScope.id] ~ text;
     }
 
     private void emitVar(string text) {
-        varSection = varSection ~ text;
+        varSection[currentScope.id] = varSection[currentScope.id] ~ text;
     }
 
     private void emitProc(string text) {
@@ -85,7 +90,9 @@ class CCodeGenerator : AstVisitor {
             }
         }
         for (int symbolId = 0; symbolId < nextId; symbolId++) {
-            writeln("Symbol: " ~ symbols[symbolId].name ~ "(" ~ to!string(symbolId) ~ ") -> " ~ symbols[symbolId].nick);
+            writeln("Symbol: " ~ symbols[symbolId].name ~ "(" ~ to!string(symbolId) ~ ") in scope (" ~ 
+                    symbols[symbolId].getScopeName() ~ ") parent scope (" ~
+                    symbols[symbolId].getParentScopeName() ~ ") -> " ~ symbols[symbolId].nick);
         }
     }
 
@@ -102,9 +109,8 @@ class CCodeGenerator : AstVisitor {
         exitScope();
 
         emit("#include <stdio.h>\n\n");
-        emit(constSection ~ "\n");
-        emit(varSection ~ "\n");
-        foreach (index; procSection.keys.sort!"a < b"[1..procSection.length]) {
+        emit(funcProtoSection ~ "\n\n");
+        foreach (index; procSection.keys.sort!"a > b"[0..$ - 1]) {
             emit(procSection[index] ~ "\n");
         }
         emit(procSection[0] ~ "\n");
@@ -116,15 +122,19 @@ class CCodeGenerator : AstVisitor {
     }
 
     void visit(BlockNode node) {
+        constSection[currentScope.id] = "";
         if (node.getConstDecls().length > 0) {
             foreach (index, constant; node.getConstDecls()) {
+                emitConst(to!string(repeat(' ', (indentLevel+1) * 4)));
                 emitConst("const int ");
                 constant.accept(this);
                 emitConst(";\n");
             }
         }
+        varSection[currentScope.id] = "";
         if (node.getVarDecls().length > 0) {
             foreach (index, variable; node.getVarDecls()) {
+                emitVar(to!string(repeat(' ', (indentLevel+1) * 4)));
                 emitVar("int ");
                 variable.accept(this);
                 emitVar(";\n");
@@ -140,6 +150,8 @@ class CCodeGenerator : AstVisitor {
         if (typeid(node.statement) != typeid(BeginEndNode)) {
             emitProc("{\n");
             indent();
+            emitProc(constSection[currentScope.id] ~ "\n");
+            emitProc(varSection[currentScope.id] ~ "\n");
         }
         node.statement.accept(this);
         if (typeid(node.statement) != typeid(BeginEndNode)) {
@@ -177,8 +189,19 @@ class CCodeGenerator : AstVisitor {
 
     void visit(ProcDeclNode node) {
         enterScope(node.getIdent().getSymbolId());
+        string funcProto = "";
         procSection[currentScope.id] = "";
-        emitProc("void " ~ node.getIdent().getNick() ~ "(void)\n");
+        funcProto = funcProto ~ "void " ~ node.getIdent().getNick() ~ "(";
+        int[] outerContext = currentScope.getOuterContext();
+        foreach (index, key; outerContext) {
+            funcProto = funcProto ~ "int " ~ (symbols[key].kind == SymbolKind.VAR ? "*" : "") ~ symbols[key].nick;
+            if (index + 1 < outerContext.length) {
+                funcProto = funcProto ~ ", ";
+            }
+        }
+        funcProto = funcProto ~ ")";
+        emitFuncProto(funcProto ~ ";\n");
+        emitProc(funcProto ~ "\n");
         node.getBlock().accept(this);
         exitScope();
     }
@@ -190,7 +213,8 @@ class CCodeGenerator : AstVisitor {
         string symbolName = node.getIdent().getName();
         if ((foundSymbol = lookupSymbol(symbolName)) !is null) {
             printIndent();
-            emitProc(node.getIdent().getNick() ~ " = ");
+            emitProc((foundSymbol.scopeId != currentScope.id && foundSymbol.kind == SymbolKind.VAR
+                    ? "*" : "") ~ node.getIdent().getNick() ~ " = ");
             node.getExpression().accept(this);
             emitProc(";\n");
         } else {
@@ -201,7 +225,15 @@ class CCodeGenerator : AstVisitor {
 
     void visit(CallNode node) {
         printIndent();
-        emitProc(node.getIdent().getNick() ~ "();\n");
+        emitProc(node.getIdent().getNick() ~ "(");
+        int[] outerContext = scopes[node.getIdent().getSymbolId()].getOuterContext();
+        foreach (index, key; outerContext) {
+            if (symbols[key].kind == SymbolKind.PROCEDURE) continue;
+            emitProc(((symbols[key].scopeId == currentScope.id && symbols[key].kind == SymbolKind.VAR)
+                        ? "&" : "") ~ symbols[key].nick);
+            if (index + 1 < outerContext.length) emitProc(", ");
+        }
+        emitProc(");\n");
     }
 
     void visit(ReadNode node) {
@@ -227,6 +259,14 @@ class CCodeGenerator : AstVisitor {
         printIndent();
         emitProc("{\n");
         indent();
+        if (constSection[currentScope.id] != "") {
+            emitProc(constSection[currentScope.id] ~ "\n");
+            constSection[currentScope.id] = "";
+        }
+        if (varSection[currentScope.id] != "") {
+            emitProc(varSection[currentScope.id] ~ "\n");
+            varSection[currentScope.id] = "";
+        }
         foreach (index, statement; node.getStatements()) {
             statement.accept(this);
             if (index + 1 >= node.getStatements().length) {
@@ -353,7 +393,9 @@ class CCodeGenerator : AstVisitor {
     }
 
     void visit(IdentNode node) {
-        emitProc(node.getNick());
+        emitProc((symbols[node.getSymbolId()].scopeId != currentScope.id 
+                    && symbols[node.getSymbolId()].kind == SymbolKind.VAR
+                            ? "*" : "") ~ node.getNick());
     }
 
     void visit(ParenExpNode node) {

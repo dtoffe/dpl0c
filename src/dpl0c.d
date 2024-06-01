@@ -51,6 +51,10 @@ void main(string[] args) {
 
         CCodeGenerator cCodeGenerator = new CCodeGenerator(sourceFileName);
         node.accept(cCodeGenerator);
+        // ErrorManager.printErrors();
+
+        // LLVMCodeGenerator llvmCodeGenerator = new LLVMCodeGenerator(sourceFileName);
+        // node.accept(llvmCodeGenerator);
         // // ErrorManager.printErrors();
     }
 

@@ -1,41 +1,46 @@
 #include <stdio.h>
 
-const int max = 100;
+void isprime(int *ret, int *arg);
+void primes(int *arg, int max, int *ret);
 
-int arg;
-int ret;
-int i;
 
-void isprime(void)
+void primes(int *arg, int max, int *ret)
 {
-    ret = 1;
-    i = 2;
-    while (i < arg)
+    *arg = 2;
+    while (*arg < max)
     {
-        if (arg / i * i == arg)
+        isprime(ret, arg);
+        if (*ret == 1)
+            printf("%d\n", *arg);
+        *arg = *arg + 1;
+    }
+}
+
+void isprime(int *ret, int *arg)
+{
+    int i;
+
+    *ret = 1;
+    i = 2;
+    while (i < *arg)
+    {
+        if (*arg / i * i == *arg)
         {
-            ret = 0;
-            i = arg;
+            *ret = 0;
+            i = *arg;
         }
         i = i + 1;
     }
 }
 
-void primes(void)
-{
-    arg = 2;
-    while (arg < max)
-    {
-        isprime();
-        if (ret == 1)
-            printf("%d\n", arg);
-        arg = arg + 1;
-    }
-}
-
 int main(int argc, char *argv[])
 {
-    primes();
+    const int max = 100;
+
+    int arg;
+    int ret;
+
+    primes(&arg, max, &ret);
     return 0;
 }
 

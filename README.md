@@ -57,12 +57,13 @@ The compiler is written in D and features:
   - :heavy_check_mark: A transpiling code generator which emits Pascal source code. (Granted, reading PL/0 and emitting Pascal should count as cheating).
     - The examples are tested and run OK.
   - :heavy_check_mark: A transpiling code generator which emits C source code. (Other languages do this, so probably not cheating, or cheating not so much).
-    - ~~The examples are tested and run OK.~~ Ops, found a bug, global variables and recursive calls don't mix well...
+    - The examples are tested and run OK.
   - :construction: An [LLVM IR](https://llvm.org/) code generator.
-    - It's almost finished, but still working on proper nesting of scopes.
+    - I'm working on it right now, probably half way already.
   - :interrobang: A [QBE](https://c9x.me/compile/) code generator.
   - :interrobang: A CLR (.NET) bytecode generator ?
   - :interrobang: A JVM (Java) bytecode generator ?
+  - :interrobang: An [Eigen Compiler Suite](https://ecs.openbrace.org/) backend generator ?
 - :construction: Runtime library in C for the implementation of "read" and "write" (Needed for the LLVM and the QBE code generators).
 - :interrobang: Alternative lexer and parser following the Roslyn design principles (compiler as a service), complete with a language server.
 - :star: If the stars get properly aligned and I finally start my personal/developer blog, maybe a tutorial !!!
@@ -77,7 +78,9 @@ I would love, however, adding error recovery to the parser, for example via symb
 
 For D language development I used the [DMD compiler](https://dlang.org/download.html) and the [Digital Mars free C++ compiler](https://www.digitalmars.com/download/freecompiler.html). I'm using VSCode with the D Programming Language (code-d) extension from the VSCode Marketplace. The project is [dub](https://code.dlang.org/) based.
 
-To run the Pascal generated sources I used the [Free Pascal compiler](https://www.freepascal.org/).
+To compile and run the Pascal generated sources I used the [Free Pascal compiler](https://www.freepascal.org/).
+
+To compile and run the C generated sources I used the [Digital Mars free C++ compiler](https://www.digitalmars.com/download/freecompiler.html).
 
 ## Examples
 

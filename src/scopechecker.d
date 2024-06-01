@@ -4,6 +4,7 @@
  */
 module scopechecker;
 
+import std.algorithm.searching;
 import std.conv;
 import std.stdio;
 import std.string;
@@ -100,6 +101,19 @@ class ScopeChecker : AstVisitor {
                         symbolName ~ "' cannot be assigned a value.");
             }
             writeln("Assign to variable: " ~ symbolName ~ " in scope: " ~ foundSymbol.getScopeName());
+            if (foundSymbol.scopeId != currentScope.id) {
+                int chainScopeId = currentScope.id;
+                while (chainScopeId != foundSymbol.scopeId) {
+                    writeln("Searching for " ~ foundSymbol.nick ~ " in scope: " ~ to!string(chainScopeId));
+                    if ((scopes[chainScopeId].outerContext).find(foundSymbol.id).empty) {
+                        scopes[chainScopeId].outerContext ~= foundSymbol.id;
+                        writeln(foundSymbol.nick ~ " added to outer scope in scope: " ~ scopes[chainScopeId].nick);
+                    }
+                    chainScopeId = (scopes[chainScopeId].parent is null)
+                                        ? foundSymbol.scopeId
+                                        : scopes[chainScopeId].parent.id;
+                }
+            }
             node.getIdent().setSymbolId(foundSymbol.id);
         } else {
             ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
@@ -121,6 +135,19 @@ class ScopeChecker : AstVisitor {
                         symbolName ~ "' cannot be called.");
             }
             writeln("Call to procedure: " ~ symbolName ~ " in scope: " ~ foundSymbol.getScopeName());
+            // if (foundSymbol.scopeId != currentScope.id) {
+            //     int chainScopeId = currentScope.id;
+            //     while (chainScopeId != foundSymbol.scopeId) {
+            //         writeln("Searching for " ~ foundSymbol.nick ~ " in scope: " ~ to!string(chainScopeId));
+            //         if ((scopes[chainScopeId].outerContext).find(foundSymbol.id).empty) {
+            //             scopes[chainScopeId].outerContext ~= foundSymbol.id;
+            //             writeln(foundSymbol.nick ~ " added to outer scope in scope: " ~ scopes[chainScopeId].nick);
+            //         }
+            //         chainScopeId = (scopes[chainScopeId].parent is null)
+            //                             ? foundSymbol.scopeId
+            //                             : scopes[chainScopeId].parent.id;
+            //     }
+            // }
             node.getIdent().setSymbolId(foundSymbol.id);
         } else {
             ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
@@ -141,6 +168,19 @@ class ScopeChecker : AstVisitor {
                         symbolName ~ "' cannot be read into.");
             }
             writeln("Read into variable: " ~ symbolName ~ " in scope: " ~ foundSymbol.getScopeName());
+            if (foundSymbol.scopeId != currentScope.id) {
+                int chainScopeId = currentScope.id;
+                while (chainScopeId != foundSymbol.scopeId) {
+                    writeln("Searching for " ~ foundSymbol.nick ~ " in scope: " ~ to!string(chainScopeId));
+                    if ((scopes[chainScopeId].outerContext).find(foundSymbol.id).empty) {
+                        scopes[chainScopeId].outerContext ~= foundSymbol.id;
+                        writeln(foundSymbol.nick ~ " added to outer scope in scope: " ~ scopes[chainScopeId].nick);
+                    }
+                    chainScopeId = (scopes[chainScopeId].parent is null)
+                                        ? foundSymbol.scopeId
+                                        : scopes[chainScopeId].parent.id;
+                }
+            }
             node.getIdent().setSymbolId(foundSymbol.id);
         } else {
             ErrorManager.addScopeError(ErrorLevel.ERROR, "Error: Identifier '" ~
@@ -218,6 +258,19 @@ class ScopeChecker : AstVisitor {
             }
             if (foundSymbol.kind == SymbolKind.VAR) {
                 writeln("Referenced variable: " ~ symbolName ~ " in scope: " ~ foundSymbol.getScopeName());
+            }
+            if (foundSymbol.scopeId != currentScope.id) {
+                int chainScopeId = currentScope.id;
+                while (chainScopeId != foundSymbol.scopeId) {
+                    writeln("Searching for " ~ foundSymbol.nick ~ " in scope: " ~ to!string(chainScopeId));
+                    if ((scopes[chainScopeId].outerContext).find(foundSymbol.id).empty) {
+                        scopes[chainScopeId].outerContext ~= foundSymbol.id;
+                        writeln(foundSymbol.nick ~ " added to outer scope in scope: " ~ scopes[chainScopeId].nick);
+                    }
+                    chainScopeId = (scopes[chainScopeId].parent is null)
+                                        ? foundSymbol.scopeId
+                                        : scopes[chainScopeId].parent.id;
+                }
             }
             node.setSymbolId(foundSymbol.id);
         } else {

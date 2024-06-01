@@ -57,7 +57,12 @@ class Symbol {
     }
 
     public string getScopeName() {
-        return scopes[this.scopeId].name;
+        return (this.scopeId == -1) ? "null" : scopes[this.scopeId].name;
+    }
+
+    public string getParentScopeName() {
+        return (this.scopeId == -1) ? "null" :
+                (scopes[this.scopeId].parent is null) ? "null" : scopes[this.scopeId].parent.name;
     }
 
     public LLVMValueRef getValueRef() {
@@ -72,11 +77,16 @@ class Symbol {
 
 class Scope : Symbol {
 
-    Symbol[string] symbolTable;
     Scope parent;
+    Symbol[string] symbolTable;
+    int[] outerContext;
 
     this(string name) {
         super(name, SymbolKind.PROCEDURE, SymbolType.INTEGER, 0);
+    }
+
+    public int[] getOuterContext() {
+        return this.outerContext;
     }
 
 }

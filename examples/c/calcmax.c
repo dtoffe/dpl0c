@@ -1,26 +1,29 @@
 #include <stdio.h>
 
-const int MAX = 100;
+void Max__(int *a, int *b, int *max_, int MAX);
 
-int max_;
-int a;
-int b;
 
-void Max__(void)
+void Max__(int *a, int *b, int *max_, int MAX)
 {
-    if (a >= b)
-        max_ = a;
-    if (b > a)
-        max_ = b;
-    if (max_ < MAX)
-        max_ = MAX;
+    if (*a >= *b)
+        *max_ = *a;
+    if (*b > *a)
+        *max_ = *b;
+    if (*max_ < MAX)
+        *max_ = MAX;
 }
 
 int main(int argc, char *argv[])
 {
+    const int MAX = 100;
+
+    int max_;
+    int a;
+    int b;
+
     scanf("%d", &a);
     scanf("%d", &b);
-    Max__();
+    Max__(&a, &b, &max_, MAX);
     printf("%d\n", max_);
     return 0;
 }
