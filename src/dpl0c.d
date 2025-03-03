@@ -5,6 +5,7 @@
 module dpl0c;
 
 import std.file;
+import std.getopt;
 import std.stdio;
 import ast;
 import codegenc;
@@ -21,12 +22,21 @@ enum VERSION = "0.0.1";
 
 void main(string[] args) {
     writefln("\nThe D PL/0 Compiler v. %s", VERSION);
-    if (args.length < 2) {
-        writeln("Usage: dpl0c <sourceFileName>");
+    if (args.length < 3) {
+        writeln("Usage: dpl0c -t|--target <target> -s|--source <sourceFileName>");
+        writeln("<target> can be: c, pas, llvm");
+        writeln("Example: dpl0c -t pas -s main.pas");
         writeln();
         return;
     }
-    string sourceFileName = args[1];
+
+    string targetLanguage;
+    string sourceFileName;
+
+    getopt(args,
+        "t|target", &targetLanguage,
+        "s|source", &sourceFileName
+    );
     string sourceContent = readText(sourceFileName);
 
     Lexer lex = new Lexer(sourceContent);
@@ -45,17 +55,25 @@ void main(string[] args) {
         writeln("Errors found in compilation, cannot generate source code.");
         ErrorManager.printErrors();
     } else {
-        // PascalCodeGenerator pascalCodeGenerator = new PascalCodeGenerator(sourceFileName);
-        // node.accept(pascalCodeGenerator);
-        // ErrorManager.printErrors();
 
-        CCodeGenerator cCodeGenerator = new CCodeGenerator(sourceFileName);
-        node.accept(cCodeGenerator);
-        // ErrorManager.printErrors();
-
-        // LLVMCodeGenerator llvmCodeGenerator = new LLVMCodeGenerator(sourceFileName);
-        // node.accept(llvmCodeGenerator);
-        // // ErrorManager.printErrors();
+        switch (targetLanguage) {
+            case "pas":
+                PascalCodeGenerator pascalCodeGenerator = new PascalCodeGenerator(sourceFileName);
+                node.accept(pascalCodeGenerator);
+                break;
+            case "c":
+                CCodeGenerator cCodeGenerator = new CCodeGenerator(sourceFileName);
+                node.accept(cCodeGenerator);
+                break;
+            case "llvm":
+                LLVMCodeGenerator llvmCodeGenerator = new LLVMCodeGenerator(sourceFileName);
+                node.accept(llvmCodeGenerator);
+                break;
+            default:
+                writeln("Unknown target language.");
+                break;
+        }
+        ErrorManager.printErrors();
     }
 
 }
