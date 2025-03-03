@@ -74,17 +74,44 @@ I'm yet undecided about adding optimization passes.
 
 I would love, however, adding error recovery to the parser, for example via symbol insertion of missing semicolons. But I've still got to figure out how to do it.
 
-## Setup
-
-For D language development I used the [DMD compiler](https://dlang.org/download.html) and the [Digital Mars free C++ compiler](https://www.digitalmars.com/download/freecompiler.html). I'm using VSCode with the D Programming Language (code-d) extension from the VSCode Marketplace. The project is [dub](https://code.dlang.org/) based.
-
-To compile and run the Pascal generated sources I used the [Free Pascal compiler](https://www.freepascal.org/).
-
-To compile and run the C generated sources I used the [Digital Mars free C++ compiler](https://www.digitalmars.com/download/freecompiler.html).
-
 ## Examples
 
 Take a look at the examples in the [examples/README.md](examples/README.md) file.
+
+## Setup
+
+For D language development I use the [DMD compiler](https://dlang.org/download.html) and the [Digital Mars free C++ compiler](https://www.digitalmars.com/download/freecompiler.html). I'm using VSCode with the D Programming Language (code-d) extension from the VSCode Marketplace.
+
+The project is built with the [dub](https://code.dlang.org/) build tool:
+
+```bash
+D:\your-path> dub build
+```
+
+To compile and run the Pascal generated sources I used the [Free Pascal compiler](https://www.freepascal.org/).
+
+```bash
+D:\your-path> ./dpl0c.exe -t pas -s ./examples/calc.pl0
+
+D:\your-path> fpc ./examples/pas/calc.pas
+```
+
+To compile and run the C generated sources I used the [Digital Mars free C++ compiler](https://www.digitalmars.com/download/freecompiler.html).
+
+```bash
+D:\your-path> ./dpl0c.exe -t c -s ./examples/calc.pl0
+
+D:\your-path> dmc ./examples/c/calc.c
+```
+
+Then you can run (and test) the generated executables:
+
+```bash
+D:\your-path> ./examples/pas/calc.exe
+D:\your-path> ./examples/c/calc.exe
+
+...etc
+```
 
 ## Thanks to
 
