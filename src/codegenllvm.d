@@ -74,7 +74,7 @@ class LLVMCodeGenerator : AstVisitor {
         LLVMValueRef writeIntegerDecl = LLVMAddFunction(llvmModule, "writeInteger", writeIntegerType);
     }
 
-    void verifyModuleAndPrint() {
+    void verifyModule() {
         LLVMVerifierFailureAction action = LLVMPrintMessageAction;
         char* error = null;
         LLVMBool result = LLVMVerifyModule(llvmModule, action, &error);
@@ -84,10 +84,24 @@ class LLVMCodeGenerator : AstVisitor {
         } else {
             writeln("Module verification succeeded!");
         }
+    }
 
+    void printModule() {
         char *generatedCode = LLVMPrintModuleToString(llvmModule);
         string output = to!string(generatedCode);
         writeln(output);
+    }
+
+    void writeModuleToFile() {
+        // Get file name from complete path
+        string result = moduleName[11..moduleName.indexOf(".", 2)];
+        // Get generated module text
+        char *generatedCode = LLVMPrintModuleToString(llvmModule);
+        string codeString = to!string(generatedCode);
+        // Write source to file
+        File file = File("./examples/llvm/" ~ result ~ ".ll", "w");
+        file.write(codeString);
+        file.close();
     }
 
     void finalizeLLVM() {
@@ -113,11 +127,12 @@ class LLVMCodeGenerator : AstVisitor {
         enterScope(symtable.MAIN_SCOPE);
         node.getBlock().accept(this);
         exitScope();
-
+writeln("Codegen visit done for program ", moduleName, " :");
         LLVMBuildRet(llvmBuilder, LLVMConstInt(LLVMInt32Type(), 0, true));
 
-        verifyModuleAndPrint();
-
+        verifyModule();
+        //printModule();
+         writeModuleToFile();
         finalizeLLVM();
     }
 
@@ -195,6 +210,10 @@ class LLVMCodeGenerator : AstVisitor {
     //void visit(StatementNode node); // abstract
     
     void visit(AssignNode node) {
+if (currentScope.name == "main") {
+    writeln("Generating code for assign into variable : " ~ node.getIdent().getName());
+}
+
         Symbol foundSymbol;
         string symbolName = node.getIdent().getName();
         LLVMValueRef variableRef;
@@ -220,6 +239,9 @@ class LLVMCodeGenerator : AstVisitor {
     }
 
     void visit(ReadNode node) {
+if (currentScope.name == "main") {
+    writeln("Generating code for read call into variable : " ~ node.getIdent().getName());
+}
         Symbol foundSymbol;
         string symbolName = node.getIdent().getName();
         LLVMValueRef variableRef;
@@ -314,9 +336,15 @@ class LLVMCodeGenerator : AstVisitor {
         LLVMValueRef llvmValue;
         LLVMValueRef llvmLeftValue;
         LLVMValueRef llvmRightValue;
+if (currentScope.name == "main") {
+    writeln("About to accept left side of condition.");
+}
         node.getLeft().accept(this);
         llvmLeftValue = node.getLeft().getLlvmValue();
         node.getRight().accept(this);
+if (currentScope.name == "main") {
+    writeln("Accepted right side of condition ");
+}
         llvmRightValue = node.getRight().getLlvmValue();
         switch (node.getRelOperator()) {
             case TokenType.EQUAL:
@@ -401,22 +429,47 @@ class LLVMCodeGenerator : AstVisitor {
     //void visit(FactorNode node); // abstract
 
     void visit(NumberNode node) {
+if (currentScope.name == "main") {
+    writeln("Generating code for number reference : " ~ node.getValue());
+}
         LLVMValueRef numberRef;
         numberRef = LLVMConstInt(int32Type, node.getNumberValue, true);
         node.setLlvmValue(numberRef);
     }
 
     void visit(IdentNode node) {
+if (currentScope.name == "main") {
+    writeln("Generating code for ident reference : " ~ node.getName());
+}
         Symbol foundSymbol;
         string symbolName = node.getName();
         LLVMValueRef variableRef;
         if ((foundSymbol = lookupSymbol(symbolName)) !is null) {
+writeln("About to build load instruction for symbol : " ~ node.getName() ~ " valueref : " ~
+    fromStringz(LLVMPrintValueToString(symbols[node.getSymbolId()].getValueRef())));
+
+            auto pointerType = LLVMTypeOf(symbols[node.getSymbolId()].getValueRef());
+            if (LLVMGetTypeKind(pointerType) != LLVMPointerTypeKind) {
+                writeln("Error: Pointer type expected, but got ", LLVMPrintTypeToString(pointerType));
+                //return null;
+            }
+
             variableRef = LLVMBuildLoad(llvmBuilder, symbols[node.getSymbolId()].getValueRef(), symbolName.toStringz());
+            if (variableRef == null) {
+                writeln("Error: LLVMBuildLoad failed.");
+            } else {
+                writeln("BuildLoad response : " ~ node.getName() ~ " valueref : " ~
+    fromStringz(LLVMPrintValueToString(variableRef)));
+            }
+writeln("Load instruction for symbol : " ~ node.getName() ~ " generated.");
         } else {
             ErrorManager.addCodeGenError(ErrorLevel.ERROR, "Error: Symbol '" ~ symbolName ~ "' ~
                     not found in current or parent scopes.");
         }
         node.setLlvmValue(variableRef);
+if (currentScope.name == "main") {
+    writeln("Code for ident reference : " ~ node.getName() ~ " generated.");
+}
     }
 
     void visit(ParenExpNode node) {
