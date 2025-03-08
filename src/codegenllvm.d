@@ -68,10 +68,10 @@ class LLVMCodeGenerator : AstVisitor {
     void setupExternals() {
         // Setup external functions
         LLVMTypeRef readIntegerType = LLVMFunctionType(LLVMInt32Type(), null, 0, 0);
-        LLVMValueRef readIntegerDecl = LLVMAddFunction(llvmModule, "readInteger", readIntegerType);
+        LLVMValueRef readIntegerDecl = LLVMAddFunction(llvmModule, "read", readIntegerType);
         LLVMTypeRef[] paramTypes = [LLVMInt32Type()];
         LLVMTypeRef writeIntegerType = LLVMFunctionType(LLVMVoidType(), paramTypes.ptr, 1, 0);
-        LLVMValueRef writeIntegerDecl = LLVMAddFunction(llvmModule, "writeInteger", writeIntegerType);
+        LLVMValueRef writeIntegerDecl = LLVMAddFunction(llvmModule, "write", writeIntegerType);
     }
 
     void verifyModule() {
@@ -132,7 +132,7 @@ writeln("Codegen visit done for program ", moduleName, " :");
 
         verifyModule();
         //printModule();
-         writeModuleToFile();
+        writeModuleToFile();
         finalizeLLVM();
     }
 
@@ -250,7 +250,7 @@ if (currentScope.name == "main") {
             variableRef = symbols[node.getIdent().getSymbolId()].getValueRef();
 
             LLVMValueRef[] functionArgs = null;
-            LLVMValueRef readFunction = LLVMGetNamedFunction(llvmModule, "readInteger");
+            LLVMValueRef readFunction = LLVMGetNamedFunction(llvmModule, "read");
             LLVMValueRef readCall = LLVMBuildCall(llvmBuilder, readFunction, functionArgs.ptr,
                                                 cast(uint)functionArgs.length, "read");
 
@@ -266,7 +266,7 @@ if (currentScope.name == "main") {
         node.getExpression().accept(this);
         llvmExpressionValue = node.getExpression().getLlvmValue();
         LLVMValueRef[] functionArgs = [llvmExpressionValue];
-        LLVMValueRef writeFunction = LLVMGetNamedFunction(llvmModule, "writeInteger");
+        LLVMValueRef writeFunction = LLVMGetNamedFunction(llvmModule, "write");
 
         LLVMValueRef writeCall = LLVMBuildCall(llvmBuilder, writeFunction, functionArgs.ptr,
                                             cast(uint)functionArgs.length, "");

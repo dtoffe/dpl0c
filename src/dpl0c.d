@@ -22,7 +22,7 @@ enum VERSION = "0.0.1";
 
 void main(string[] args) {
     writefln("\nThe D PL/0 Compiler v. %s", VERSION);
-    if (args.length < 3) {
+    if (args.length < 5) {
         writeln("Usage: dpl0c -t|--target <target> -s|--source <sourceFileName>");
         writeln("<target> can be: c, pas, llvm");
         writeln("Example: dpl0c -t pas -s main.pas");

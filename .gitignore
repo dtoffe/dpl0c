@@ -1,6 +1,7 @@
 .dub
 docs.json
 __dummy.html
+/_docs
 /dpl0c
 dpl0c.so
 dpl0c.dylib
@@ -14,4 +15,3 @@ dpl0c-test-*
 *.obj
 *.lst
 *.map
-src/*.txt

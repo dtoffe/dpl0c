@@ -104,6 +104,20 @@ D:\your-path> ./dpl0c.exe -t c -s ./examples/calc.pl0
 D:\your-path> dmc ./examples/c/calc.c
 ```
 
+**Warning, LLVM code generation is still a work in progress, the LLVM IR code generator is not yet fully implemented.**
+
+To compile and run the LLVM IR generated sources I used the [LLVM toolchain](https://llvm.org/). LLVM provides a C library API to interface from other languages called llvm-c, and there is a D language wrapper for llvm-c called [LLVM-D](https://github.com/llvm-d/llvm-d), which supports LLVM versions 3.0 to 10.0, as per its own docs, so the LLVM release you use should be compatible.
+
+But in practice, in the downloads page for LLVM there are many varsions which do not provide a Windows build, and among those, some do not provide the needed dlls, so I used LLVM 10.0.0 release for Windows (64 bits). You must ensure that there is a LLVM-C.dll file and a LTO.dll file in your LLVM/bin folder, otherwise the build of the compiler will fail (only so silently, it will generate an executable and fail on run).
+
+```bash
+D:\your-path> ./dpl0c.exe -t llvm -s ./examples/calc.pl0
+
+D:\your-path> llc -filetype=obj ./examples/llvm/calcmax.ll -o calcmax.o
+
+D:\your-path> clang calcmax.o -o calcmax.exe
+```
+
 Then you can run (and test) the generated executables:
 
 ```bash
