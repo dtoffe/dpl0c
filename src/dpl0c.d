@@ -18,7 +18,7 @@ import prettyprinter;
 import scopechecker;
 import token;
 
-enum VERSION = "0.0.1";
+const VERSION = "0.0.1";
 
 void main(string[] args) {
     writefln("\nThe D PL/0 Compiler v. %s", VERSION);

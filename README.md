@@ -58,6 +58,8 @@ The compiler is written in D and features:
     - The examples are tested and run OK.
   - :heavy_check_mark: A transpiling code generator which emits C source code. (Other languages do this, so probably not cheating, or cheating not so much).
     - The examples are tested and run OK.
+  - :construction: A P-Code machine code generator, using the [P-Code Machine](https://en.wikipedia.org/wiki/P-code_machine) from the book *Algorithms + Data Structures = Programs* by Niklaus Wirth (1976).
+    - The P-Code machine interpreter is  implemented, basically a D translation of the P-Code machine from the book, as taken from the Wikipedia page linked above.
   - :construction: An [LLVM IR](https://llvm.org/) code generator.
     - I'm working on it right now, probably half way already.
   - :interrobang: A [QBE](https://c9x.me/compile/) code generator.
